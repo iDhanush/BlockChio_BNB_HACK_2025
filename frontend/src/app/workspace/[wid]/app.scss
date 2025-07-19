@@ -936,3 +936,89 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
     }
   }
 }
+
+// SCSS for the Execution Status Toast Component
+
+// 1. Keyframes for the loading spinner animation
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// 2. Utility class to apply the spin animation
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+// 3. Main toast container styles
+.status-toast {
+  // Positioning
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; // Ensure it's on top of canvas elements
+
+  // Layout (Flexbox)
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  // Appearance
+  min-width: 320px;
+  max-width: 500px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #333; // Default background
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+
+  // --- Modifier classes for different status types ---
+  &.info {
+    background-color: #2563eb; // Blue
+  }
+  &.success {
+    background-color: #16a34a; // Green
+  }
+  &.error {
+    background-color: #dc2626; // Red
+  }
+
+  // --- Child element styles ---
+  .status-icon {
+    flex-shrink: 0; // Prevent the icon from shrinking
+    display: flex;
+    align-items: center;
+  }
+
+  .status-message {
+    flex-grow: 1; // Allow the message to take up available space
+    margin: 0;
+    text-align: left;
+  }
+
+  .close-toast {
+    // Reset button styles
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: auto; // Push it to the far right
+
+    // Appearance
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

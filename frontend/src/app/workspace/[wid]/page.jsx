@@ -4,7 +4,6 @@ import "./app.scss";
 import {
   Play,
   Save,
-  Settings,
   MessageCircle,
   Send,
   Globe,
@@ -15,14 +14,24 @@ import {
   X,
   CheckCircle,
   KeyRound,
+  LoaderCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 import ChatWidget from "@/components/ui/ChatWidget/ChatWidget";
 import { AnimatePresence } from "framer-motion";
-import { updateWflow, getWflow } from "@/utils/workflow"; // Ensure getWflow is imported
+import {
+  updateWflow,
+  getWflow,
+  executeWflow,
+  getExecutionStatus,
+} from "@/utils/workflow";
 import { useParams } from "next/navigation";
 
-// Enhanced Node Templates with node_class and default tool states
+//==============================================================================
+// CONSTANTS & TEMPLATES
+//==============================================================================
+
 const nodeTemplates = [
   // Triggers
   {
@@ -205,7 +214,6 @@ const nodeTemplates = [
   },
 ];
 
-// Color mapping from names to hex codes
 const colorMap = {
   green: "#34d399",
   blue: "#60a5fa",
@@ -215,9 +223,9 @@ const colorMap = {
   indigo: "#818cf8",
   pink: "#f472b6",
   teal: "#2dd4bf",
+  gray: "#9ca3af",
 };
 
-// Helper function to convert hex to a string of RGB values
 const hexToRgb = (hex) => {
   let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -228,9 +236,48 @@ const hexToRgb = (hex) => {
     : null;
 };
 
-// Node Popup Component
+//==============================================================================
+// HELPER COMPONENTS
+//==============================================================================
+
+const ExecutionStatusToast = ({ status, onClose }) => {
+  const getIcon = () => {
+    switch (status.type) {
+      case "info":
+        return <LoaderCircle size={20} className="animate-spin" />;
+      case "success":
+        return <CheckCircle size={20} />;
+      case "error":
+        return <AlertTriangle size={20} />;
+      default:
+        return null;
+    }
+  };
+
+  useEffect(() => {
+    if (status.type === "success" || status.type === "error") {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, onClose]);
+
+  if (!status) return null;
+
+  return (
+    <div className={`status-toast ${status.type}`}>
+      <div className="status-icon">{getIcon()}</div>
+      <p className="status-message">{status.message}</p>
+      <button className="close-toast" onClick={onClose}>
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
+
 const NodePopup = ({ node, onClose, onSave }) => {
-  const [settings, setSettings] = useState(JSON.parse(JSON.stringify(node))); // Deep copy to avoid direct mutation
+  const [settings, setSettings] = useState(JSON.parse(JSON.stringify(node)));
 
   const handleCredentialChange = (key, value) => {
     setSettings((prev) => ({
@@ -272,9 +319,7 @@ const NodePopup = ({ node, onClose, onSave }) => {
             <X size={20} />
           </button>
         </div>
-
         <div className="popup-content">
-          {/* Credentials Section */}
           {settings.creds &&
             settings.creds.length > 0 &&
             Object.keys(settings.creds[0]).length > 0 && (
@@ -295,8 +340,6 @@ const NodePopup = ({ node, onClose, onSave }) => {
                 ))}
               </div>
             )}
-
-          {/* Tools Section */}
           {settings.tools && settings.tools.length > 0 && (
             <div className="popup-section">
               <div className="tools-list">
@@ -320,10 +363,9 @@ const NodePopup = ({ node, onClose, onSave }) => {
             </div>
           )}
         </div>
-
         <div className="popup-footer">
           <button
-            className={`btn-save-settings ${node.color} `}
+            className={`btn-save-settings ${node.color}`}
             onClick={handleSave}
           >
             <Save size={16} />
@@ -335,7 +377,6 @@ const NodePopup = ({ node, onClose, onSave }) => {
   );
 };
 
-// Custom Node Component
 const WorkflowNode = ({
   node,
   onNodeMove,
@@ -352,18 +393,13 @@ const WorkflowNode = ({
 
   const handleMouseDown = (e) => {
     if (e.target.classList.contains("connection-handle")) return;
-
     if (e.detail === 2) {
       onNodeDoubleClick(node);
       return;
     }
-
     setIsDragging(true);
     const rect = nodeRef.current.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
+    setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
     onNodeSelect(node.id);
   };
 
@@ -449,22 +485,16 @@ const WorkflowNode = ({
   );
 };
 
-// Connection Line Component
 const ConnectionLine = ({ connection, nodes }) => {
   const fromNode = nodes.find((n) => n.id === connection.from_node);
   const toNode = nodes.find((n) => n.id === connection.to_node);
-
   if (!fromNode || !toNode) return null;
-
-  const fromX = fromNode.position.x + 160; // node width
-  const fromY = fromNode.position.y + 35; // node height / 2
+  const fromX = fromNode.position.x + 160;
+  const fromY = fromNode.position.y + 35;
   const toX = toNode.position.x;
   const toY = toNode.position.y + 35;
-
   const midX = fromX + (toX - fromX) * 0.5;
-
   const path = `M ${fromX} ${fromY} C ${midX} ${fromY}, ${midX} ${toY}, ${toX} ${toY}`;
-
   return (
     <path
       d={path}
@@ -477,6 +507,9 @@ const ConnectionLine = ({ connection, nodes }) => {
   );
 };
 
+//==============================================================================
+// MAIN PAGE COMPONENT
+//==============================================================================
 export default function N8nWorkflowBuilder() {
   const [nodes, setNodes] = useState([]);
   const [connections, setConnections] = useState([]);
@@ -487,57 +520,51 @@ export default function N8nWorkflowBuilder() {
   const [showNodePopup, setShowNodePopup] = useState(false);
   const [popupNode, setPopupNode] = useState(null);
   const [showChatWidget, setShowChatWidget] = useState(false);
-  const canvasRef = useRef(null);
-  const params = useParams();
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [executionStatus, setExecutionStatus] = useState(null);
 
+  const canvasRef = useRef(null);
+  const pollingIntervalRef = useRef(null);
+  const params = useParams();
   const [workflowId, setWorkflowid] = useState(params.wid);
 
-  // <<< START: UPDATED WORKFLOW LOADING LOGIC >>>
+  // --- Effects ---
   useEffect(() => {
     const loadWorkflow = async () => {
       if (!workflowId) return;
-
       try {
         const savedWorkflow = await getWflow(workflowId);
-        if (!savedWorkflow || !savedWorkflow.nodes) {
-          console.log("No saved workflow found or data is invalid.");
-          return;
-        }
-
-        // This counter will track the number of times we've seen each node type
-        // to assign the correct ID number (e.g., manual_trigger_1, manual_trigger_2)
+        if (!savedWorkflow || !savedWorkflow.nodes) return;
         const tempCounters = {};
-
         const rehydratedNodes = savedWorkflow.nodes
           .map((node) => {
             const template = nodeTemplates.find(
               (t) => t.node_id === node.node_id
             );
             if (!template) return null;
-
-            // **FIX**: Generate the unique ID here
             const currentCount = (tempCounters[node.node_id] || 0) + 1;
             tempCounters[node.node_id] = currentCount;
             const uniqueId = `${node.node_id}_${currentCount}`;
-
-            // Merge template (for icon, label), saved node (for position), and add the new ID
             return { ...template, ...node, id: uniqueId };
           })
-          .filter(Boolean); // Filter out any nulls
-
-        // Set the state with the newly processed data
+          .filter(Boolean);
         setNodes(rehydratedNodes);
         setConnections(savedWorkflow.connections || []);
-        setNodeCounter(tempCounters); // Use the counter we just built
+        setNodeCounter(tempCounters);
       } catch (error) {
         console.error("Failed to load workflow:", error);
       }
     };
-
     loadWorkflow();
-  }, [workflowId]); // Rerun effect if the workflowId changes
-  // <<< END: UPDATED WORKFLOW LOADING LOGIC >>>
+  }, [workflowId]);
 
+  useEffect(() => {
+    return () => {
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+    };
+  }, []);
+
+  // --- Handlers ---
   const addNode = useCallback(
     (template) => {
       const currentCount = nodeCounter[template.node_id] || 0;
@@ -546,7 +573,6 @@ export default function N8nWorkflowBuilder() {
         ...prev,
         [template.node_id]: currentCount + 1,
       }));
-
       const newNode = {
         ...template,
         id: newNodeId,
@@ -555,10 +581,8 @@ export default function N8nWorkflowBuilder() {
           y: Math.random() * 200 + 150,
         },
       };
-
       newNode.tools = JSON.parse(JSON.stringify(template.tools || []));
       newNode.creds = JSON.parse(JSON.stringify(template.creds || []));
-
       setNodes((prev) => [...prev, newNode]);
     },
     [nodeCounter]
@@ -605,18 +629,14 @@ export default function N8nWorkflowBuilder() {
         const connectionExists = connections.some(
           (conn) => conn.from_node === connectingFrom && conn.to_node === nodeId
         );
-
-        if (connectionExists) {
-          setConnectingFrom(null);
-          return;
+        if (!connectionExists) {
+          const newConnection = {
+            conn_id: `${connectingFrom}_to_${nodeId}_${Date.now()}`,
+            from_node: connectingFrom,
+            to_node: nodeId,
+          };
+          setConnections((prev) => [...prev, newConnection]);
         }
-
-        const newConnection = {
-          conn_id: `${connectingFrom}_to_${nodeId}_${Date.now()}`,
-          from_node: connectingFrom,
-          to_node: nodeId,
-        };
-        setConnections((prev) => [...prev, newConnection]);
       }
       setConnectingFrom(null);
     },
@@ -641,29 +661,75 @@ export default function N8nWorkflowBuilder() {
   );
 
   const saveWorkflow = useCallback(async () => {
-    const workflowData = {
-      nodes,
-      connections,
-    };
-    console.log("Saving workflow:", workflowData);
-    const res = await updateWflow(workflowId, workflowData);
-    if (res.status == 200) {
-      alert("Workflow saved! Check console for details.");
-    }
+    const workflowData = { nodes, connections };
+    await updateWflow(workflowId, workflowData);
+    setExecutionStatus({
+      type: "success",
+      message: "Workflow saved successfully!",
+    });
   }, [nodes, connections, workflowId]);
+
+  const handleExecute = useCallback(async () => {
+    if (isExecuting) return;
+    setIsExecuting(true);
+    setExecutionStatus({ type: "info", message: "Initiating execution..." });
+    if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+
+    try {
+      const workflowData = { nodes, connections };
+      const response = await executeWflow(workflowId, workflowData);
+      if (!response?.executionId)
+        throw new Error("Did not receive an execution ID.");
+      setExecutionStatus({
+        type: "info",
+        message: "Execution started. Polling for status...",
+      });
+
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          const result = await getExecutionStatus(response.executionId);
+          if (!result) return;
+          const finalStates = ["COMPLETED", "SUCCESS", "FAILED", "ERROR"];
+          if (finalStates.includes(result.status.toUpperCase())) {
+            clearInterval(pollingIntervalRef.current);
+            setIsExecuting(false);
+            setExecutionStatus({
+              type: result.status.toUpperCase().includes("FAIL")
+                ? "error"
+                : "success",
+              message: result.message,
+            });
+          } else {
+            setExecutionStatus({
+              type: "info",
+              message: `Status: ${result.message}`,
+            });
+          }
+        } catch (pollError) {
+          clearInterval(pollingIntervalRef.current);
+          setIsExecuting(false);
+          setExecutionStatus({
+            type: "error",
+            message: "Error while polling status.",
+          });
+        }
+      }, 4000);
+    } catch (error) {
+      setIsExecuting(false);
+      setExecutionStatus({
+        type: "error",
+        message: "Failed to start execution.",
+      });
+    }
+  }, [nodes, connections, workflowId, isExecuting]);
 
   const handleSaveNodeSettings = useCallback((updatedNode) => {
     setNodes((prevNodes) =>
-      prevNodes.map((n) => {
-        if (n.id === updatedNode.id) {
-          return {
-            ...n,
-            creds: updatedNode.creds,
-            tools: updatedNode.tools,
-          };
-        }
-        return n;
-      })
+      prevNodes.map((n) =>
+        n.id === updatedNode.id
+          ? { ...n, creds: updatedNode.creds, tools: updatedNode.tools }
+          : n
+      )
     );
     setShowNodePopup(false);
     setPopupNode(null);
@@ -682,12 +748,26 @@ export default function N8nWorkflowBuilder() {
             <h1 className="title">Project Builder</h1>
             <div className="actions">
               <button
-                onClick={() => alert("Executing workflow!")}
+                onClick={handleExecute}
                 className="btn btn-execute"
+                disabled={isExecuting}
               >
-                <Play size={16} /> Execute
+                {isExecuting ? (
+                  <>
+                    <LoaderCircle size={16} className="animate-spin-fast" />{" "}
+                    Executing...
+                  </>
+                ) : (
+                  <>
+                    <Play size={16} /> Execute
+                  </>
+                )}
               </button>
-              <button onClick={saveWorkflow} className="btn btn-save">
+              <button
+                onClick={saveWorkflow}
+                className="btn btn-save"
+                disabled={isExecuting}
+              >
                 <Save size={16} /> Save
               </button>
             </div>
@@ -744,6 +824,12 @@ export default function N8nWorkflowBuilder() {
         </aside>
 
         <main className="canvas-container">
+          {executionStatus && (
+            <ExecutionStatusToast
+              status={executionStatus}
+              onClose={() => setExecutionStatus(null)}
+            />
+          )}
           <div
             ref={canvasRef}
             className="workflow-canvas"
@@ -817,7 +903,6 @@ export default function N8nWorkflowBuilder() {
           onSave={handleSaveNodeSettings}
         />
       )}
-
       <AnimatePresence>
         {showChatWidget && (
           <ChatWidget onClose={() => setShowChatWidget(false)} />
