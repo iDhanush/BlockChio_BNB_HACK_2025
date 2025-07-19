@@ -16,6 +16,7 @@ class DataBase:
         self.db = self._client["BlockChio"]
         self.wflows = self.db['wflows']
         self.users = self.db['users']
+        self.contrs = self.db['deployed_contracts']
 
     async def get_wflow(self, wflow_id: str):
         await self.wflows.find_one({'wflow_id': wflow_id})
@@ -24,7 +25,7 @@ class DataBase:
         await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)
 
     async def create_wflow(self, wflow: WFlow):
-        await self.wflows.insert_one({'$set': wflow.model_dump()}, upsert=True)
+        await self.wflows.insert_one({'$set': wflow.model_dump()})
 
     ##############################################################################################
     # USER FUNCTIONS #############################################################################
