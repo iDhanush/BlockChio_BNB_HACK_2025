@@ -10,15 +10,23 @@ const page = () => {
         <div className="hero-sec">
           <div className="no-projects">
             <div className="sec-head">
-              The No-Code Playground for<br></br> Building
+              The No-Code Playground for
+              <br /> Building
               <span className="hero-span">On-Chain AI</span>
             </div>
             <div className="sec-txt">
-              Start building powerful AI workflows by<br></br> adding your first
-              project.
+              Start building powerful AI workflows by
+              <br /> adding your first project.
             </div>
+            
           </div>
         </div>
+
+        {/* 🔁 Replaces animated GIF */}
+        <video className="hero-img" autoPlay loop muted playsInline>
+          <source src="/assets/mainbg.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
     </div>
   );

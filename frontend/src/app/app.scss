@@ -2,28 +2,38 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  background-color: var(--primary-bg);
+  background-color: #000;
 }
 
 .hero {
   width: 100%;
   height: 100%;
-  --dot-bg: var(--primary-bg);
-  --dot-color: rgba(165, 165, 165, 0.196);
-  --dot-size: 2px;
-  --dot-space: 24px;
-  background: linear-gradient(
-        90deg,
-        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
-        transparent 1%
-      )
-      center / var(--dot-space) var(--dot-space),
-    linear-gradient(
-        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
-        transparent 1%
-      )
-      center / var(--dot-space) var(--dot-space),
-    var(--dot-color);
+  // --dot-bg: var(--primary-bg);
+  // --dot-color: rgba(165, 165, 165, 0.196);
+  // --dot-size: 2px;
+  // --dot-space: 24px;
+  // background: linear-gradient(
+  //       90deg,
+  //       var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+  //       transparent 1%
+  //     )
+  //     center / var(--dot-space) var(--dot-space),
+  //   linear-gradient(
+  //       var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+  //       transparent 1%
+  //     )
+  //     center / var(--dot-space) var(--dot-space),
+  //   var(--dot-color);
+  position: relative;
+  overflow: hidden;
+
+  .hero-img {
+    width: 100%;
+    position: relative;
+    bottom: 140px;
+    z-index: 0;
+    filter: brightness(0.7);
+  }
 }
 
 .hero-sec {
@@ -42,8 +52,9 @@
   }
 
   .no-projects {
+    z-index: 100;
     width: 100%;
-    height: 70vh;
+    height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -65,7 +76,7 @@
     font-family: var(--myFont);
     font-size: 50px;
     font-weight: 300;
-    color: var(--brand);
+    color: #ff5930;
     margin-left: 10px;
   }
 }
