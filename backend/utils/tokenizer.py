@@ -1,3 +1,4 @@
+from platform import freedesktop_os_release
 import jwt
 import random
 import string
@@ -14,37 +15,28 @@ def create_access_token(user_id: str) -> str:
         "iss": 'productgpt',
         "iat": datetime.utcnow(),
         "exp": datetime.utcnow() + expires_delta,
-        "sub": Var.ACCESS_TOKEN_JWT_SUBJECT}
+        "sub": Var.ACCESS_TOKEN_JWT_SUBJECT
+    }
+
+    print('ssssssssssssssss', access_token_payload, Var.SECRET_KEY, Var.ALGORITHM)
     encoded_jwt = jwt.encode(access_token_payload, Var.SECRET_KEY, algorithm=Var.ALGORITHM)
     return encoded_jwt
 
 
-# CREATE REFRESH TOKEN
 def create_refresh_token(user_id: str) -> str:
-    refresh_token_expires = timedelta(days=365)  # Set your desired refresh token duration
+    refresh_token_expires = timedelta(days=365)  # 1-year expiry
     refresh_token_payload = {
         "user_id": user_id,
-        "iss": 'productgpt',
-        "iat": datetime.utcnow(),
-        "exp": datetime.utcnow() + refresh_token_expires,
+        "iss": "productgpt",  # Issuer
+        "iat": datetime.utcnow(),  # Issued at
+        "exp": datetime.utcnow() + refresh_token_expires  # Expiration
     }
-    encoded_refresh_token = jwt.encode(refresh_token_payload, Var.R_SECRET_KEY, algorithm=Var.ALGORITHM)
+    encoded_refresh_token = jwt.encode(
+        refresh_token_payload,
+        Var.R_SECRET_KEY,
+        algorithm=Var.ALGORITHM
+    )
     return encoded_refresh_token
-
-
-# CREATE OTP TOKEN
-def create_otp_token(email: str, otp, ip) -> str:
-    otp_expires = timedelta(minutes=10)  # Set your desired refresh token duration
-    refresh_token_payload = {
-        "email": email,
-        "otp": otp,
-        "ip": ip,
-        "iss": 'productgpt',
-        "iat": datetime.utcnow(),
-        "exp": datetime.utcnow() + otp_expires,
-    }
-    otp_token = jwt.encode(refresh_token_payload, Var.R_SECRET_KEY, algorithm=Var.ALGORITHM)
-    return otp_token
 
 
 def invoke_otp() -> str:
