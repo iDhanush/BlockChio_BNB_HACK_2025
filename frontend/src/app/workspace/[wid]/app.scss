@@ -336,11 +336,23 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
       position: absolute;
       bottom: 1.5rem;
       right: 1.5rem;
-      background-color: var(--brand);
       color: var(--primary-txt);
-      padding: 1rem;
       border-radius: $border-radius-full;
       border: none;
+      background: radial-gradient(
+        100% 100% at 100% 0%,
+        #ff8c70 0%,
+        #ff5930 100%
+      );
+      box-shadow: 0px 0.01em 0.01em rgb(45 35 66 / 40%),
+        0px 0.3em 0.7em -0.01em rgb(45 35 66 / 30%),
+        inset 0px -0.01em 0px rgb(58 65 111 / 50%);
+      padding: 1rem;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 40%);
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: $shadow-lg;
       cursor: pointer;
       transition: all 0.2s;

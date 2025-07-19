@@ -939,7 +939,7 @@ export default function N8nWorkflowBuilder() {
             onClick={() => setShowChatWidget(!showChatWidget)}
             className="fab"
           >
-            <MessageSquare size={28} />
+            <MessageSquare size={20} />
           </button>
         </main>
       </div>

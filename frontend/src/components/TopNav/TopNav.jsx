@@ -42,6 +42,7 @@ const rainbowKitTheme = darkTheme({
 const WalletLogger = memo(() => {
   const { address, isConnected } = useAccount();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const logWalletActivity = async () => {
@@ -57,14 +58,19 @@ const WalletLogger = memo(() => {
             }
           );
 
-          if (res?.status === 200) {
-            router.push("/workspace");
-            await axios.get(`${baseUrl}/v1/user/profile`);
+          if (res?.status == 200 && Cookies.get("aTok")) {
+            if (pathname == "/") {
+              router.push("/workspace");
+            }
+
+            await axios.get(`${baseUrl}/v1/user/profile`, {
+              withCredentials: true,
+            });
           }
 
           console.log("Wallet connected - Address:", address);
         } catch (error) {
-          console.error("Error logging wallet or fetching profile:", error);
+          console.log("Error logging wallet or fetching profile:", error);
         }
       } else {
         console.log("Wallet disconnected");
