@@ -26,5 +26,5 @@ class ContractsData(BaseModel):
     user_id: str
     wallet: str
     network: str
-    fund_me: str
-    simplecol: str
+    fund_me: str = None
+    simplecol: str = None
