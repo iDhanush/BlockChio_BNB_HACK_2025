@@ -17,7 +17,7 @@ class Node(BaseModel):
     purpose: str
     position: dict[str, float]
     tools: list[Tool]
-    creds: list[dict[str, str]]
+    creds: list[dict[str, Optional[str]]]
 
 
 class Conn(BaseModel):

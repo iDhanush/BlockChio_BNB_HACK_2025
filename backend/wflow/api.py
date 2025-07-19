@@ -1,9 +1,11 @@
+from random import sample
+
 from fastapi import APIRouter
 
 from auth.auth import get_user
 from auth.schemas import User
 from globar_vars import Var
-from wflow.schemas import WFlow, WFlowPayload
+from wflow.schemas import WFlow, WFlowPayload, sample_workflow
 from utils.tokenizer import invoke_uid
 from fastapi import Depends
 
@@ -34,7 +36,7 @@ async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
 
 @wflow_router.get('/{wflow_id}/execute')
 async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload):
-    await Var.db.set_wflow(wflow_id, wflow_payload)
-    wflow_data = await Var.db.get_wflow(wflow_id)
-    executor = WorkflowExecutor(workflow=wflow_data)
+    # await Var.db.set_wflow(wflow_id, wflow_payload)
+    # wflow_data = await Var.db.get_wflow(wflow_id)
+    executor = WorkflowExecutor(workflow=sample_workflow)
     await executor.execute("create a cute cat")
