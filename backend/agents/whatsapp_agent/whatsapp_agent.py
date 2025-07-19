@@ -1,14 +1,12 @@
 import asyncio
-
-from langchain.agents import create_structured_chat_agent
-from langchain.agents.agent import AgentExecutor
 from langsmith import Client
-from langchain_core.tools import StructuredTool
+from agents.llm import get_llm
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
-from agents.blockchain_agent.schemas import AgentState, TransferInput, NoInput
-from agents.llm import get_llm
-from agents.whatsapp_agent.schemas import WhatsappTextInput, WhatsappImageInput
+from langchain_core.tools import StructuredTool
+from langchain.agents.agent import AgentExecutor
+from langchain.agents import create_structured_chat_agent
+from agents.whatsapp_agent.schemas import WhatsappTextInput, WhatsappImageInput, AgentState
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 
