@@ -39,7 +39,7 @@ sample_workflow = WFlow(
             node_class="WhatsappTrigger",
             pos={"x": 100, "y": 100},
             tools=[],
-            creds={},
+            creds=[],
         ),
         Node(
             node_id="image_agent_1",
@@ -48,7 +48,7 @@ sample_workflow = WFlow(
             purpose="Generate Image for the prompt given",
             pos={"x": 300, "y": 100},
             tools=[{"generate_image": True}],
-            creds={},
+            creds=[],
         ),
         Node(
             node_id="telegram_agent_1",
@@ -57,7 +57,7 @@ sample_workflow = WFlow(
             purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
             pos={"x": 500, "y": 100},
             tools=[{"send_message": True}, {"send_image": True}],
-            creds={},
+            creds=[],
         ),
         Node(
             node_id="whatsapp_agent_1",
@@ -65,7 +65,7 @@ sample_workflow = WFlow(
             node_class="WhatsappAgent",
             purpose="if the image generated is of a dog then send it to the number 9995539972 else do nothing",
             pos={"x": 500, "y": 100},
-            tools=[{"send_message": True}, {"send_image": True}], creds={},
+            tools=[{"send_message": True}, {"send_image": True}], creds=[],
         )
     ],
     connections=[Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
