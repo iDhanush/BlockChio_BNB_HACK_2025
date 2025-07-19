@@ -5,9 +5,11 @@ from fastapi import APIRouter
 import os
 from web3 import Web3
 from brownie.network.account import LocalAccount
+from responses import StandardResponse, StandardException
+
 
 dotenv.load_dotenv()
-bchain_router = APIRouter(tags=['bchain'])
+web3 = Web3(Web3.HTTPProvider("https://bsc-testnet.infura.io/v3/eab9f2aff8984a57ac11c6043cf87d78"))
 
 
 def get_account() -> LocalAccount:
@@ -15,10 +17,9 @@ def get_account() -> LocalAccount:
     print(account)
     return account
 
-
 account = get_account()
 
-p = project.load('brown')
+p = project.load('agents/blockchain_agent/brown')
 FundMe = p.FundMe
 SimpleCollectible = p.SimpleCollectible
 network.connect('bsc-testnet')
@@ -53,39 +54,52 @@ def get_or_deploy_contract():
     return contract_address_fundme, contract_address_simple
 
 
-def payment(to_addr, amount):
+def payment(to_addr, amount:float):
     to_addr = Web3.to_checksum_address(to_addr)
     fund_me = FundMe[-1]
-    tx = fund_me.fund({"from": account, "value": Web3.to_wei(f"{amount}", "ether")})
-    print("Funded")
-    balance = fund_me.getUserBalance(account)
-    print("Balance: ", balance)
-    tx.wait(1)
-    tx = fund_me.transferFunds(account, to_addr, Web3.to_wei(f"{amount}", "ether"), {"from": account})
-    print("Payment Transfered")
+    try:
+        tx = fund_me.fund({"from": account, "value": Web3.to_wei(f"{amount}", "ether")})
+        tx.wait(1)
+        tx = fund_me.transferFunds(account, to_addr, Web3.to_wei(f"{amount}", "ether"), {"from": account})
+        return "Payment Transfered Successfully"
+    except Exception as e:
+        return "Error: " + str(e)
 
 
-def mint_nft(image_uri):
+def get_balance():
+    try:
+        fund_me = FundMe[-1]
+        balance = fund_me.getUserBalance(account)
+        # acc = Web3.to_checksum_address("0x6BF61cc9cC3F71eF7aBA7A82d132E4584EEe81A1")
+        balance_wei = web3.eth.get_balance("0x6BF61cc9cC3F71eF7aBA7A82d132E4584EEe81A1")
+        return "Balance in ethers is: " + str(Web3.from_wei(balance_wei, "ether"))
+    except Exception as e:
+        return "Error: " + str(e)
+
+
+def mint_nft(image_url):
     simple = SimpleCollectible[-1]
     uri = {
         "name": f"NFT Test for BNB hack",
         "description": f"This is an nft for the BNB hack",
-        "image": "https://upload.wikimedia.org/wikipedia/commons/a/a6/020_The_lion_king_Snyggve_in_the_Serengeti_National_Park_Photo_by_Giles_Laurent.jpg",
+        "image": f"{image_url}",
         "file_hash": "blabla",
         "attributes": []
     }
     json_uri = json.dumps(uri)
-    tx = simple.createCollectible(image_uri, account, {"from": account, "gas_price": Web3.to_wei("4", "gwei")})
-    tx.wait(1)
-    print("NFT Minted")
-    return simple
+    try:
+        tx = simple.createCollectible(json_uri, account, {"from": account, "gas_price": Web3.to_wei("4", "gwei")})
+        tx.wait(1)
+        return "Successfully minted NFT with transaction hash: " + str(tx) + 'Provide hash to user'
+    except Exception as e:
+        return "Error: " + str(e)
 
 
 fundme, simple = get_or_deploy_contract()
-print("Paying")
+# print("Paying")
 # payment("0xa4ff6439038Bc7293110a629f09FaE5fB4Ef19Bc", 0.001)
 # get_account()
-mint_nft(image_uri="")
-
+# mint_nft(image_url="https://m.media-amazon.com/images/M/MV5BYTFjZWQ4MGQtMzY4YS00YjNlLWI0ZmItNDAzMjIyMTZiYjk2XkEyXkFqcGc@._V1_.jpg")
+print(get_balance())
 
 
