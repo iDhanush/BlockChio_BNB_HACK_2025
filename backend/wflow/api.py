@@ -3,7 +3,7 @@ from globar_vars import Var
 from wflow.schemas import WFlow, WFlowPayload
 from utils.tokenizer import invoke_uid
 
-wflow_router = APIRouter(prefix='wflow')
+wflow_router = APIRouter(prefix='/wflow')
 
 
 @wflow_router.post('/')
