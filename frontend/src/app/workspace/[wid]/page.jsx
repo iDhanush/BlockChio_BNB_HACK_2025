@@ -38,7 +38,6 @@ import {
 import ChatWidget from "@/components/ui/ChatWidget/ChatWidget";
 import { AnimatePresence } from "framer-motion";
 
-// Node Templates with integrated tools
 const nodeTemplates = [
   // Triggers
   {
@@ -47,29 +46,27 @@ const nodeTemplates = [
     label: "WhatsApp",
     icon: MessageCircle,
     color: "green",
+    node_class: "WhatsappTrigger",
+    creds: [],
     tools: [
       {
         id: "webhook",
         label: "Webhook Settings",
-        icon: Webhook,
         description: "Configure webhook URL and parameters",
       },
       {
         id: "auth",
         label: "Authentication",
-        icon: Key,
         description: "Set up WhatsApp Business API credentials",
       },
       {
         id: "filters",
         label: "Message Filters",
-        icon: Filter,
         description: "Filter incoming messages by content or sender",
       },
       {
         id: "templates",
         label: "Message Templates",
-        icon: FileText,
         description: "Configure message templates",
       },
     ],
@@ -80,29 +77,27 @@ const nodeTemplates = [
     label: "Telegram",
     icon: Send,
     color: "blue",
+    node_class: "TelegramTrigger",
+    creds: [],
     tools: [
       {
         id: "bot_token",
         label: "Bot Token",
-        icon: Key,
         description: "Configure Telegram bot token",
       },
       {
         id: "webhook",
         label: "Webhook",
-        icon: Webhook,
         description: "Set up webhook for receiving messages",
       },
       {
         id: "commands",
         label: "Bot Commands",
-        icon: Code,
         description: "Configure bot commands and responses",
       },
       {
         id: "filters",
         label: "Message Filters",
-        icon: Filter,
         description: "Filter messages by type or content",
       },
     ],
@@ -113,29 +108,27 @@ const nodeTemplates = [
     label: "WebChat",
     icon: Globe,
     color: "purple",
+    node_class: "WebchatTrigger",
+    creds: [],
     tools: [
       {
         id: "embed",
         label: "Embed Code",
-        icon: Code,
         description: "Get embed code for your website",
       },
       {
         id: "styling",
         label: "Chat Styling",
-        icon: Palette,
         description: "Customize chat widget appearance",
       },
       {
         id: "analytics",
         label: "Analytics",
-        icon: Activity,
         description: "Track chat performance and metrics",
       },
       {
         id: "notifications",
         label: "Notifications",
-        icon: Mail,
         description: "Configure notification settings",
       },
     ],
@@ -148,30 +141,46 @@ const nodeTemplates = [
     label: "Blockchain Agent",
     icon: Bot,
     color: "orange",
+    node_class: "BlockchainAgent",
+    creds: [],
     tools: [
       {
         id: "wallet",
         label: "Wallet Connection",
-        icon: Link,
         description: "Connect to blockchain wallets",
       },
       {
         id: "contracts",
         label: "Smart Contracts",
-        icon: Database,
         description: "Manage smart contract interactions",
       },
       {
         id: "transactions",
         label: "Transaction Monitor",
-        icon: Monitor,
         description: "Monitor blockchain transactions",
       },
       {
         id: "networks",
         label: "Network Settings",
-        icon: Globe,
         description: "Configure blockchain networks",
+      },
+      {
+        label: "Send Transaction",
+        description: "Send a transaction",
+        tool_func: "send_transaction",
+        active: true,
+      },
+      {
+        label: "Mint NFT",
+        description: "Send a transaction",
+        tool_func: "mint_nft",
+        active: true,
+      },
+      {
+        label: "Get Balance",
+        description: "Send a transaction",
+        tool_func: "get_balance",
+        active: true,
       },
     ],
   },
@@ -181,30 +190,34 @@ const nodeTemplates = [
     label: "Image Generation",
     icon: Image,
     color: "red",
+    node_class: "ImageAgent",
+    creds: [],
     tools: [
       {
         id: "models",
         label: "AI Models",
-        icon: Brain,
         description: "Select and configure AI models",
       },
       {
         id: "prompts",
         label: "Prompt Templates",
-        icon: FileText,
         description: "Create and manage prompt templates",
       },
       {
         id: "styles",
         label: "Style Settings",
-        icon: Palette,
         description: "Configure image styles and parameters",
       },
       {
         id: "processing",
         label: "Image Processing",
-        icon: Cpu,
         description: "Post-processing and optimization",
+      },
+      {
+        label: "Generate Image",
+        description: "Generate an image",
+        tool_func: "generate_image",
+        active: true,
       },
     ],
   },
@@ -214,32 +227,42 @@ const nodeTemplates = [
     label: "WhatsApp Agent",
     icon: MessageCircle,
     color: "green",
+    node_class: "WhatsappAgent",
+    creds: [],
     tools: [
       {
         id: "send_template",
         label: "Send Template Message",
-        icon: FileText,
         description: "Send pre-approved message templates",
       },
       {
         id: "manage_contacts",
         label: "Manage Contacts",
-        icon: Database,
         description: "Add, update, or remove contacts",
       },
       {
         id: "message_status",
         label: "Message Status",
-        icon: CheckCircle,
         description:
           "Track the status of sent messages (sent, delivered, read)",
       },
       {
         id: "api_health",
         label: "API Health",
-        icon: Monitor,
         description:
           "Check the health and status of the WhatsApp API connection",
+      },
+      {
+        label: "Send Message",
+        description: "Send a transaction",
+        tool_func: "send_message",
+        active: true,
+      },
+      {
+        label: "Send Image",
+        description: "Send a transaction",
+        tool_func: "send_image",
+        active: true,
       },
     ],
   },
@@ -249,30 +272,40 @@ const nodeTemplates = [
     label: "Telegram Agent",
     icon: Send,
     color: "blue",
+    node_class: "TelegramAgent",
+    creds: [{ bot_token: null }],
     tools: [
       {
         id: "send_message",
         label: "Send Message",
-        icon: Send,
         description: "Send text, media, or interactive messages",
       },
       {
         id: "manage_chat",
         label: "Manage Chat",
-        icon: Settings,
         description: "Manage chat settings, members, and permissions",
       },
       {
         id: "get_updates",
         label: "Get Updates",
-        icon: Activity,
         description: "Fetch real-time updates and message history",
       },
       {
         id: "api_settings",
         label: "API Settings",
-        icon: Key,
         description: "Configure advanced API parameters",
+      },
+      {
+        label: "Send Message",
+        description: "Send a transaction",
+        tool_func: "send_message",
+        active: true,
+      },
+      {
+        label: "Send Image",
+        description: "Send a transaction",
+        tool_func: "send_image",
+        active: true,
       },
     ],
   },
@@ -282,30 +315,52 @@ const nodeTemplates = [
     label: "AI Assistant",
     icon: Brain,
     color: "teal",
+    node_class: "ConversationAgent",
+    creds: [],
     tools: [
       {
         id: "capabilities",
         label: "AI Capabilities",
-        icon: Brain,
         description: "Configure AI assistant features",
       },
       {
         id: "integrations",
         label: "Integrations",
-        icon: Link,
         description: "Connect with external services",
       },
       {
         id: "scheduling",
         label: "Task Scheduling",
-        icon: Calendar,
         description: "Schedule automated tasks",
       },
       {
         id: "security",
         label: "Security Settings",
-        icon: Shield,
         description: "Configure security and permissions",
+      },
+      {
+        label: "RAG",
+        description: "Send a transaction",
+        tool_func: "get_from_rag",
+        active: true,
+      },
+      {
+        label: "Unibase Chat Memory",
+        description: "Send a transaction",
+        tool_func: "unibase_chat_memory",
+        active: true,
+      },
+      {
+        label: "Google Search Tool",
+        description: "Send a transaction",
+        tool_func: "google_search",
+        active: true,
+      },
+      {
+        label: "Youtube Search Tool",
+        description: "Send a transaction",
+        tool_func: "youtube_search",
+        active: true,
       },
     ],
   },
@@ -385,9 +440,6 @@ const NodePopup = ({ node, onClose, onToolSelect }) => {
                   className={`tool-btn ${isConfigured ? "configured" : ""}`}
                   onClick={() => onToolSelect(tool, node)}
                 >
-                  <div className="tool-icon">
-                    <tool.icon size={16} />
-                  </div>
                   <div className="tool-info">
                     <div className="tool-label">
                       {tool.label}
