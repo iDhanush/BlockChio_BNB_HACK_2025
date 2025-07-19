@@ -2,7 +2,7 @@ import os
 from pytz import timezone
 from motor import motor_asyncio
 
-from wflow.schemas import WoFl
+from wflow.schemas import WFlow
 
 ist = timezone("Asia/Kolkata")
 
@@ -12,10 +12,10 @@ class DataBase:
         uri = os.environ.get('MONGO_URI', "mongodb://localhost:27017")
         self._client = motor_asyncio.AsyncIOMotorClient(uri)
         self.db = self._client["BlockChio"]
-        self.wofls = self.db['wofls']
+        self.wflows = self.db['wflows']
 
-    async def get_wflow(self, wofl_id: str):
-        await self.wofls.find_one({'wofl_id': wofl_id})
+    async def get_wflow(self, wflow_id: str):
+        await self.wflows.find_one({'wflow_id': wflow_id})
 
-    async def set_wflow(self, wofl_id: str, wofl: WoFl):
-        await self.wofls.update_one({'wofl_id': wofl_id}, {'$set': wofl.model_dump()}, upsert=True)
+    async def set_wflow(self, wflow_id: str, wflow: WFlow):
+        await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)

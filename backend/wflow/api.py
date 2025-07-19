@@ -5,6 +5,7 @@ from globar_vars import Var
 wflow_router = APIRouter(prefix='wflow')
 
 
-@wflow_router.get('/{wofl_id}')
-async def get_wflow(wofl_id):
-    await Var.db.get_wflow(wofl_id)
+@wflow_router.get('/{wflow_id}')
+async def get_wflow(wflow_id):
+    await Var.db.get_wflow(wflow_id)
+
