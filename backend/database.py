@@ -1,8 +1,10 @@
 import os
-from typing import Union
+from typing import Union, Optional
 
 from pytz import timezone
 from motor import motor_asyncio
+
+from agents.blockchain_agent.schemas import ContractsData
 from auth.schemas import User
 from wflow.schemas import WFlow, WFlowPayload
 
@@ -16,7 +18,7 @@ class DataBase:
         self.db = self._client["BlockChio"]
         self.wflows = self.db['wflows']
         self.users = self.db['users']
-        self.contrs = self.db['deployed_contracts']
+        self.contracts = self.db['contracts']
 
     async def get_wflow(self, wflow_id: str):
         await self.wflows.find_one({'wflow_id': wflow_id})
@@ -44,3 +46,20 @@ class DataBase:
     async def reg_user(self, user: User) -> User:
         await self.users.insert_one(user.model_dump())
         return user
+
+    async def get_addresses_from_db(self, user_id) -> Optional[ContractsData]:
+        try:
+            document = await  self.contracts.find_one({'user_id': user_id})
+            if document:
+                contract_data: ContractsData = ContractsData(**document)
+                return contract_data
+            return None
+        except Exception as e:
+            return None
+
+    async def save_addresses_to_db(self, contract_data: ContractsData):
+        try:
+            await self.contracts.update_one({'wallet': contract_data.wallet}, {'$set': contract_data.model_dump()},
+                                      upsert=True)
+        except Exception as e:
+            pass

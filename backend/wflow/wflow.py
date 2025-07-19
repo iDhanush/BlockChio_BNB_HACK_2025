@@ -21,7 +21,7 @@ class WorkflowExecutor:
         self.node_map = {node.node_id: node for node in self.workflow.nodes}
         # Create an adjacency list to represent the graph's connections
         self.adjacency_list = collections.defaultdict(list)
-        for conn in self.workflow.conns:
+        for conn in self.workflow.connections:
             self.adjacency_list[conn.from_node].append(conn.to_node)
 
         self.execution_results = {}
@@ -82,7 +82,7 @@ class WorkflowExecutor:
             for node_id in nodes_to_process:
                 # This assumes a simple linear chain or fan-out structure.
                 # For fan-in, this logic would need to be more complex.
-                predecessor_id = next(c.from_node for c in self.workflow.conns if c.to_node == node_id)
+                predecessor_id = next(c.from_node for c in self.workflow.connections if c.to_node == node_id)
                 input_data = self.execution_results[predecessor_id]
                 tasks.append(self._execute_node(node_id, input_data))
 
