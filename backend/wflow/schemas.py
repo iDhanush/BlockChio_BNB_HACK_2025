@@ -20,6 +20,7 @@ class Conn(BaseModel):
 class WFlow(BaseModel):
     wflow_id: str
     user_id: str
+    wflow_name: str
     nodes: list[Node]
     connections: list[Conn]
 
@@ -74,12 +75,13 @@ sample_workflow = WFlow(
         Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
         Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
         Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
-        ]
+    ]
 )
 print(sample_workflow.model_dump())
 
 
 class WFlowPayload(BaseModel):
+    wflow_name: str
     nodes: list[Node]
     connections: list[Conn]
 
