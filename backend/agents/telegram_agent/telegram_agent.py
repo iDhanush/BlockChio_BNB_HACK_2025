@@ -1,14 +1,12 @@
 import asyncio
-
-from langchain.agents import create_structured_chat_agent
+from agents.llm import get_llm
 from langchain.agents.agent import AgentExecutor
+from langchain.agents import create_structured_chat_agent
 from langsmith import Client
 from langchain_core.tools import StructuredTool
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
-from agents.blockchain_agent.schemas import AgentState
-from agents.llm import get_llm
-from agents.telegram_agent.schemas import TelegramImageInput, TelegramTextInput
+from agents.telegram_agent.schemas import TelegramImageInput, TelegramTextInput, AgentState
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 
