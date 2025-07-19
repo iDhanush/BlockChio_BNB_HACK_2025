@@ -832,8 +832,33 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
       cursor: pointer;
       transition: background-color 0.2s;
 
+      &.green {
+        background-color: $success-color;
+      }
+      &.blue {
+        background-color: $primary-color;
+      }
+      &.purple {
+        background-color: $purple-color;
+      }
+      &.red {
+        background-color: $danger-color;
+      }
+      &.orange {
+        background-color: $orange-color;
+      }
+      &.indigo {
+        background-color: $indigo-color;
+      }
+      &.pink {
+        background-color: $pink-color;
+      }
+      &.teal {
+        background-color: $teal-color;
+      }
+
       &:hover {
-        opacity: .9;
+        opacity: 0.9;
       }
     }
   }

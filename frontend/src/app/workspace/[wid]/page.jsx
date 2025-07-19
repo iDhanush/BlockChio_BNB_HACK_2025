@@ -444,9 +444,9 @@ const NodePopup = ({ node, onClose, onSave }) => {
             settings.creds.length > 0 &&
             Object.keys(settings.creds[0]).length > 0 && (
               <div className="popup-section">
-                <h4 className="section-title">
+                {/* <h4 className="section-title">
                   <KeyRound size={16} /> Credentials
-                </h4>
+                </h4> */}
                 {Object.keys(settings.creds[0]).map((key) => (
                   <div className="form-group" key={key}>
                     <label htmlFor={key}>{key.replace(/_/g, " ")}</label>
@@ -467,9 +467,9 @@ const NodePopup = ({ node, onClose, onSave }) => {
           {/* Tools Section */}
           {settings.tools && settings.tools.length > 0 && (
             <div className="popup-section">
-              <h4 className="section-title">
+              {/* <h4 className="section-title">
                 <Settings size={16} /> Tools
-              </h4>
+              </h4> */}
               <div className="tools-list">
                 {settings.tools.map((tool) => (
                   <div key={tool.id} className="tool-item">
@@ -493,7 +493,10 @@ const NodePopup = ({ node, onClose, onSave }) => {
         </div>
 
         <div className="popup-footer">
-          <button className="btn-save-settings" onClick={handleSave}>
+          <button
+            className={`btn-save-settings ${node.color} `}
+            onClick={handleSave}
+          >
             <Save size={16} />
             Save Settings
           </button>
@@ -596,12 +599,12 @@ const WorkflowNode = ({
         <div className="node-info">
           <div className="node-label">{node.label}</div>
           <div className="node-type">{node.type}</div>
-          {isConfigured && (
+          {/* {isConfigured && (
             <div className="node-status">
               <CheckCircle size={12} />
               <span>{activeToolCount} tools active</span>
             </div>
-          )}
+          )} */}
         </div>
       </div>
       <div
