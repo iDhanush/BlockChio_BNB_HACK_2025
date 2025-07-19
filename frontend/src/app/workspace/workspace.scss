@@ -1,0 +1,97 @@
+.work-space-wrap {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--primary-bg);
+}
+.workspace-body {
+  width: 100%;
+  height: 100%;
+  --dot-bg: var(--primary-bg);
+  --dot-color: rgba(165, 165, 165, 0.196);
+  --dot-size: 2px;
+  --dot-space: 24px;
+  background: linear-gradient(
+        90deg,
+        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+        transparent 1%
+      )
+      center / var(--dot-space) var(--dot-space),
+    linear-gradient(
+        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+        transparent 1%
+      )
+      center / var(--dot-space) var(--dot-space),
+    var(--dot-color);
+}
+
+.workspace-sec {
+  width: 100%;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  grid-area: 20px;
+
+  .sec-head {
+    font-family: var(--myFont);
+    font-size: 50px;
+    color: var(--primary-txt);
+    font-weight: 300;
+  }
+
+  .no-projects {
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+  .sec-txt {
+    font-size: 20px;
+    color: #7f7f7f;
+    font-weight: 300;
+    margin-top: -10px;
+  }
+  .add-project-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(
+      0,
+      0,
+      0,
+      0.025
+    ); // subtle light glass effect for dark background
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.141),
+      inset 0 1px 0 rgba(255, 255, 255, 0.038),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 0 20px 5px rgba(255, 255, 255, 0.028);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .add-project-btn:hover {
+    transform: scale(0.96);
+    transition: all 0.3s ease-in-out;
+  }
+  .add-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background-color: var(--brand);
+    border-radius: 10px;
+  }
+  .btn-txt {
+    font-size: 20px;
+    color: var(--btn-txt);
+  }
+}
