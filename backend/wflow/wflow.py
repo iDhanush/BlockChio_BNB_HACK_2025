@@ -1,6 +1,6 @@
 import asyncio
 import collections
-from wflow.schemas import WorkFlow, sample_workflow
+from wflow.schemas import WoFl, sample_workflow
 from agents.image_agent.image_agent import ImageAgent
 from agents.whatsapp_agent.whatsapp_agent import WhatsappAgent
 from agents.telegram_agent.telegram_agent import TelegramAgent
@@ -15,7 +15,7 @@ AGENT_CLASS_MAP = {
 
 
 class WorkflowExecutor:
-    def __init__(self, workflow: WorkFlow):
+    def __init__(self, workflow: WoFl):
         self.workflow = workflow
         # Create a quick lookup map for nodes by their ID
         self.node_map = {node.node_id: node for node in self.workflow.nodes}

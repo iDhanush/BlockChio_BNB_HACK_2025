@@ -17,16 +17,16 @@ class Conn(BaseModel):
     to_node: str
 
 
-class WorkFlow(BaseModel):
-    workflow_id: str
+class WoFl(BaseModel):
+    wofl_id: str
     user_id: str
     nodes: list[Node]
     conns: list[Conn]
 
 
-sample_workflow = WorkFlow(
+sample_workflow = WoFl(
     user_id='',
-    workflow_id='wfl_OLASjlajnfJ',
+    wofl_id='wfl_OLASjlajnfJ',
     nodes=[
         Node(
             node_id="whatsapp_trigger_1",
