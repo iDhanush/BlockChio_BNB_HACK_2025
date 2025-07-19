@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--poppins);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("/fonts/JumperPersonalUseOnlyLight-Eaovj.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MyFont";
+  src: url("/fonts/JumperPersonalUseOnlyThin-ZVLDB.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* fonts */
+  --myFont: "MyFont";
+  --poppins: "Poppins", sans-serif;
+  --merri-font: "Merriweather", serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --primary-bg: #101013;
+  --sec-bg: #101013;
+  --border: #28282b;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  --primary-txt: #fff;
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  --brand: #FF7D2B;
+
+  --add-btn:#212121;
+  --btn-txt:#fff;
 }
