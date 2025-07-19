@@ -41,7 +41,28 @@ import { AnimatePresence } from "framer-motion";
 const nodeTemplates = [
   // Triggers
   {
-    id: "whatsapp_trigger",
+    node_id: "manual_trigger",
+    type: "trigger",
+    label: "Manual Trigger",
+    icon: Play,
+    color: "gray",
+    node_class: "ManualTrigger",
+    creds: [],
+    tools: [
+      {
+        id: "run_button",
+        label: "Run Manually",
+        description: "Start the workflow manually using this trigger",
+      },
+      {
+        id: "debug_mode",
+        label: "Debug Mode",
+        description: "Enable debug mode for testing this trigger",
+      },
+    ],
+  },
+  {
+    node_id: "whatsapp_trigger",
     type: "trigger",
     label: "WhatsApp",
     icon: MessageCircle,
@@ -72,7 +93,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "telegram_trigger",
+    node_id: "telegram_trigger",
     type: "trigger",
     label: "Telegram",
     icon: Send,
@@ -103,7 +124,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "webchat_trigger",
+    node_id: "webchat_trigger",
     type: "trigger",
     label: "WebChat",
     icon: Globe,
@@ -136,7 +157,7 @@ const nodeTemplates = [
 
   // Agents
   {
-    id: "blockchain_agent",
+    node_id: "blockchain_agent",
     type: "agent",
     label: "Blockchain Agent",
     icon: Bot,
@@ -185,7 +206,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "image_generation_agent",
+    node_id: "image_generation_agent",
     type: "agent",
     label: "Image Generation",
     icon: Image,
@@ -222,7 +243,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "whatsapp_agent",
+    node_id: "whatsapp_agent",
     type: "agent",
     label: "WhatsApp Agent",
     icon: MessageCircle,
@@ -267,7 +288,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "telegram_agent",
+    node_id: "telegram_agent",
     type: "agent",
     label: "Telegram Agent",
     icon: Send,
@@ -310,7 +331,7 @@ const nodeTemplates = [
     ],
   },
   {
-    id: "ai_assistant_agent",
+    node_id: "ai_assistant_agent",
     type: "agent",
     label: "AI Assistant",
     icon: Brain,
@@ -642,13 +663,13 @@ const ConnectionLine = ({ connection, nodes }) => {
 export default function N8nWorkflowBuilder() {
   const [nodes, setNodes] = useState([
     {
-      id: "whatsapp_trigger_1",
+      node_id: "whatsapp_trigger_1",
       position: { x: 100, y: 100 },
       label: "WhatsApp Trigger",
       type: "trigger",
       icon: MessageCircle,
       color: "green",
-      tools: nodeTemplates.find((t) => t.id === "whatsapp_trigger").tools,
+      tools: nodeTemplates.find((t) => t.node_id === "whatsapp_trigger").tools,
       configuredTools: [],
     },
   ]);
