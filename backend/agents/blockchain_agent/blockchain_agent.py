@@ -6,19 +6,22 @@ from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
 from agents.blockchain_agent.blockchian import get_balance, payment, mint_nft
 from langchain_google_genai import ChatGoogleGenerativeAI
+from web3 import Web3
 from pydantic import BaseModel
 from agents.blockchain_agent.schemas import AgentState, TransferInput, NoInput, NftInput
 from agents.llm import get_llm
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
+web3 = Web3(Web3.HTTPProvider("https://bsc-testnet.infura.io/v3/eab9f2aff8984a57ac11c6043cf87d78"))
 
 
 
 class BlockchainAgent:
-    def __init__(self):
+    def __init__(self, cred: dict):
         self.llm = get_llm()
         self.tools = []
-        self.walletadress = 'xxx'
+        self.wallet = cred.get("wallet")
+        self.private_key = cred.get("private_key")
         self.agent = self.get_agent()
         self.struct_tools = self.StructTools(self)
 
@@ -69,9 +72,9 @@ class BlockchainAgent:
         print(type(search_list), search_list)
         return "yoyoyo"
 
-    @staticmethod
-    def get_balance():
-        return  get_balance()
+    def get_balance(self):
+        balance_wei = web3.eth.get_balance(self.wallet)
+        return  "Your balance in ether is: " + str(web3.from_wei(balance_wei, "ether"))
 
     @staticmethod
     def transfer(to: str, amount):
@@ -80,7 +83,6 @@ class BlockchainAgent:
     @staticmethod
     def mint_nft(url: str):
         return  mint_nft(url)
-
 
     @staticmethod
     def create_workflow(agent_executor):
@@ -133,7 +135,10 @@ class BlockchainAgent:
 
 import asyncio
 async def main():
-    agent = BlockchainAgent()
+    agent = BlockchainAgent({
+        "wallet": "0x6BF61cc9cC3F71eF7aBA7A82d132E4584EEe81A1",
+        "private_key": "0x6BF61cc9cC3F71eF7aBA7A82d132E4584EEe81A1"
+    })
     agent.tools.append(agent.struct_tools.get_balance)
     agent.tools.append(agent.struct_tools.transfer)
     agent.tools.append(agent.struct_tools.mint_nft)
