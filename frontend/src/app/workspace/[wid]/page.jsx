@@ -646,8 +646,10 @@ export default function N8nWorkflowBuilder() {
       connections,
     };
     console.log("Saving workflow:", workflowData);
-    await updateWflow(workflowId, workflowData);
-    alert("Workflow saved! Check console for details.");
+    const res = await updateWflow(workflowId, workflowData);
+    if (res.status == 200) {
+      alert("Workflow saved! Check console for details.");
+    }
   }, [nodes, connections, workflowId]);
 
   const handleSaveNodeSettings = useCallback((updatedNode) => {

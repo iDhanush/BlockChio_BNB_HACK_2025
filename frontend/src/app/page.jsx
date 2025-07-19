@@ -3,42 +3,42 @@ import { useEffect, useRef } from "react";
 import TopNav from "@/components/TopNav/TopNav";
 import "./app.scss";
 
-// Import GSAP and its ScrollTrigger plugin
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+// // Import GSAP and its ScrollTrigger plugin
+// import { gsap } from "gsap";
+// import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import DASH from "../../public/assets/dashimg.png";
 import Image from "next/image";
 
-// Register the ScrollTrigger plugin with GSAP
-gsap.registerPlugin(ScrollTrigger);
+// // Register the ScrollTrigger plugin with GSAP
+// gsap.registerPlugin(ScrollTrigger);
 
 const Page = () => {
-  // Create refs for the main container and the image to be animated
+  // // Create refs for the main container and the image to be animated
   const mainRef = useRef(null);
   const dashImgRef = useRef(null);
 
-  // useEffect hook to set up the animation after the component mounts
-  useEffect(() => {
-    // Create a GSAP context for safe cleanup
-    const ctx = gsap.context(() => {
-      // Define the animation
-      gsap.to(dashImgRef.current, {
-        scale: 1, // Animate scale to 1
-        ease: "none", // Use a linear ease for direct correlation with scroll
-        scrollTrigger: {
-          trigger: ".dash-img-cover-wrapper", // The element that triggers the animation
-          start: "top bottom", // Animation starts when the top of the trigger hits the bottom of the viewport
-          end: "bottom 80%", // Animation ends when the bottom of the trigger is 80% from the top of the viewport
-          scrub: 1, // Links the animation progress directly to the scrollbar position (1 provides a little smoothing)
-          // markers: true, // Uncomment for debugging to see start/end markers
-        },
-      });
-    }, mainRef); // Scope the context to the main container
+  // // useEffect hook to set up the animation after the component mounts
+  // useEffect(() => {
+  //   // Create a GSAP context for safe cleanup
+  //   const ctx = gsap.context(() => {
+  //     // Define the animation
+  //     gsap.to(dashImgRef.current, {
+  //       scale: 1, // Animate scale to 1
+  //       ease: "none", // Use a linear ease for direct correlation with scroll
+  //       scrollTrigger: {
+  //         trigger: ".dash-img-cover-wrapper", // The element that triggers the animation
+  //         start: "top bottom", // Animation starts when the top of the trigger hits the bottom of the viewport
+  //         end: "bottom 80%", // Animation ends when the bottom of the trigger is 80% from the top of the viewport
+  //         scrub: 1, // Links the animation progress directly to the scrollbar position (1 provides a little smoothing)
+  //         // markers: true, // Uncomment for debugging to see start/end markers
+  //       },
+  //     });
+  //   }, mainRef); // Scope the context to the main container
 
-    // Cleanup function to revert all GSAP animations and ScrollTriggers on component unmount
-    return () => ctx.revert();
-  }, []); // Empty dependency array ensures this effect runs only once
+  //   // Cleanup function to revert all GSAP animations and ScrollTriggers on component unmount
+  //   return () => ctx.revert();
+  // }, []); // Empty dependency array ensures this effect runs only once
 
   return (
     // Add the ref to the main container

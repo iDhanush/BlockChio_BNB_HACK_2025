@@ -95,3 +95,130 @@
     color: var(--btn-txt);
   }
 }
+
+// ... your existing SCSS styles ...
+
+/* --- Popup Styles --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup-content {
+  background: #1e1e1e; // A slightly lighter shade than pure black
+  padding: 30px 35px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out;
+
+  h2 {
+    color: var(--primary-txt);
+    font-size: 20px;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  p {
+    color: #8a8a8a;
+    font-size: 15px;
+    margin: 0 0 10px 0;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: var(--primary-txt);
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #ff5930;
+    }
+  }
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid #555;
+    color: #999;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ccc;
+    }
+  }
+
+  .btn-create {
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
+    }
+  }
+}
+
+.popup-error {
+  color: #ff7070;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* --- Keyframe Animations for Popup --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

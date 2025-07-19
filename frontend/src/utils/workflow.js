@@ -6,8 +6,8 @@ export async function updateWflow(wflowId, data) {
     const response = await axios.put(`${baseUrl}/wflow/${wflowId}`, data, {
       withCredentials: true,
     });
-
-    return response.data;
+    console.log(response);
+    return response;
   } catch (error) {
     console.log(
       "Failed to update workflow:",
