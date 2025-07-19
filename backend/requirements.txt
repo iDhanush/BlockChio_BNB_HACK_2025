@@ -22,3 +22,5 @@ langsmith
 langchain-community
 langchain-google-community
 starlette
+eth-brownie
+
