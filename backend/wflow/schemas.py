@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, constr
 
 
@@ -82,7 +84,7 @@ print(sample_workflow.model_dump())
 
 
 class WFlowPayload(BaseModel):
-    wflow_name: str
+    wflow_name: Optional[str] = None
     nodes: list[Node]
     connections: list[Conn]
 
