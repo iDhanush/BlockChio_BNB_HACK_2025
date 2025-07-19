@@ -1,6 +1,5 @@
-import asyncio
-import random
 import jwt
+from fastapi import Depends
 import json
 import aiohttp
 from globar_vars import Var
@@ -10,7 +9,6 @@ from user.utils import get_or_reg_user
 from responses import StandardException
 from fastapi import Request, security, Security
 from auth.schemas import TokenPayload, User
-from google.auth.transport import requests
 
 reusable_oauth2 = security.OAuth2PasswordBearer(tokenUrl="/auth")
 
