@@ -15,6 +15,9 @@ import { WagmiProvider } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
+import axios from "axios";
+import { baseUrl } from "@/constants";
+import { useRouter } from "next/navigation";
 
 // Create singletons outside component to prevent recreation on every render
 const config = getDefaultConfig({
@@ -38,13 +41,37 @@ const rainbowKitTheme = darkTheme({
 // Memoized WalletLogger component to prevent unnecessary re-renders
 const WalletLogger = memo(() => {
   const { address, isConnected } = useAccount();
+  const router = useRouter();
 
   useEffect(() => {
-    if (isConnected && address) {
-      console.log("Wallet connected - Address:", address);
-    } else {
-      console.log("Wallet disconnected");
-    }
+    const logWalletActivity = async () => {
+      if (isConnected && address) {
+        try {
+          const res = await axios.post(
+            `${baseUrl}/v1/auth/user/wallet-auth`,
+            {
+              wallet: address,
+            },
+            {
+              withCredentials: true,
+            }
+          );
+
+          if (res?.status === 200) {
+            router.push("/workspace");
+            await axios.get(`${baseUrl}/v1/user/profile`);
+          }
+
+          console.log("Wallet connected - Address:", address);
+        } catch (error) {
+          console.error("Error logging wallet or fetching profile:", error);
+        }
+      } else {
+        console.log("Wallet disconnected");
+      }
+    };
+
+    logWalletActivity();
   }, [isConnected, address]);
 
   return <ConnectButton label="Sign In" accountStatus="avatar" />;
