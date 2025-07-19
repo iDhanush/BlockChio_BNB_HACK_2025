@@ -793,9 +793,6 @@ export default function N8nWorkflowBuilder() {
               </button>
             </div>
           </div>
-          <button className="settings-btn">
-            <Settings size={20} />
-          </button>
         </div>
       </header>
 
