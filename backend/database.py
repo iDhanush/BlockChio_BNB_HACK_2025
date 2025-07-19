@@ -25,14 +25,16 @@ class DataBase:
         wflow_data = await self.wflows.find_one({'wflow_id': wflow_id})
         if not wflow_data:
             raise StandardException(details='workflow not found', status_code=404)
+        print(wflow_data)
         wflow_data = WFlow(**wflow_data)
+
         return wflow_data
 
     async def set_wflow(self, wflow_id: str, wflow: WFlowPayload):
         await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)
 
     async def create_wflow(self, wflow: WFlow):
-        await self.wflows.insert_one({'$set': wflow.model_dump()})
+        await self.wflows.insert_one(wflow.model_dump())
 
     ##############################################################################################
     # USER FUNCTIONS #############################################################################
