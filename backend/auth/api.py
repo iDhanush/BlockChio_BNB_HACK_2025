@@ -18,7 +18,7 @@ async def google_auth_handler(wallet_payload: WalletAuthPayload, response: Respo
         httponly=True,
         secure=True,  # Use False for local dev if not HTTPS
         samesite="none",  # Or "Strict"/"None" as needed
-        max_age=3600  # 1 hour for access token, adjust as needed
+        max_age=60 * 60 * 24 * 365  # 1 year for refresh token
     )
     response.set_cookie(
         key="rTok",
