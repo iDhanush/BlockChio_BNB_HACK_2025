@@ -18,8 +18,8 @@ async def create_wflow(wflow_payload: WFlowPayload, user: User = Depends(get_use
 
 @wflow_router.get('/{wflow_id}')
 async def get_wflow(wflow_id):
-    await Var.db.get_wflow(wflow_id)
-
+    res = await Var.db.get_wflow(wflow_id)
+    return res
 
 @wflow_router.put('/{wflow_id}')
 async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):

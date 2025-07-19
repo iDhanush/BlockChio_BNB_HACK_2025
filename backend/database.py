@@ -6,6 +6,7 @@ from motor import motor_asyncio
 
 from agents.blockchain_agent.schemas import ContractsData
 from auth.schemas import User
+from responses import StandardException
 from wflow.schemas import WFlow, WFlowPayload
 
 ist = timezone("Asia/Kolkata")
@@ -21,7 +22,11 @@ class DataBase:
         self.contracts = self.db['contracts']
 
     async def get_wflow(self, wflow_id: str):
-        await self.wflows.find_one({'wflow_id': wflow_id})
+        wflow_data = await self.wflows.find_one({'wflow_id': wflow_id})
+        if not wflow_data:
+            raise StandardException(details='workflow not found', status_code=404)
+        wflow_data = WFlow(**wflow_data)
+        return wflow_data
 
     async def set_wflow(self, wflow_id: str, wflow: WFlowPayload):
         await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)
@@ -60,6 +65,6 @@ class DataBase:
     async def save_addresses_to_db(self, contract_data: ContractsData):
         try:
             await self.contracts.update_one({'wallet': contract_data.wallet}, {'$set': contract_data.model_dump()},
-                                      upsert=True)
+                                            upsert=True)
         except Exception as e:
             pass
