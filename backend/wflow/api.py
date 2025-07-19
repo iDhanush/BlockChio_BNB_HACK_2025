@@ -29,3 +29,7 @@ async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
 @wflow_router.put('/{wflow_id}')
 async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
     await Var.db.set_wflow(wflow_id, wflow_payload)
+
+@wflow_router.get('/{wflow_id}/execute')
+async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload):
+    await Var.db.set_wflow(wflow_id, wflow_payload)
