@@ -14,11 +14,13 @@ import {
   Brain,
   X,
   CheckCircle,
+  KeyRound,
 } from "lucide-react";
 
 import ChatWidget from "@/components/ui/ChatWidget/ChatWidget";
 import { AnimatePresence } from "framer-motion";
 
+// Enhanced Node Templates with node_class and default tool states
 const nodeTemplates = [
   // Triggers
   {
@@ -26,7 +28,7 @@ const nodeTemplates = [
     type: "trigger",
     label: "Manual Trigger",
     icon: Play,
-    color: "teal",
+    color: "gray",
     node_class: "ManualTrigger",
     creds: [],
     tools: [
@@ -392,10 +394,31 @@ const hexToRgb = (hex) => {
 };
 
 // Node Popup Component
-const NodePopup = ({ node, onClose, onToolSelect }) => {
-  if (!node) return null;
+const NodePopup = ({ node, onClose, onSave }) => {
+  const [settings, setSettings] = useState(JSON.parse(JSON.stringify(node))); // Deep copy to avoid direct mutation
 
-  const tools = node.tools || [];
+  const handleCredentialChange = (key, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      creds: [{ ...prev.creds[0], [key]: value }],
+    }));
+  };
+
+  const handleToolToggle = (toolId) => {
+    setSettings((prev) => ({
+      ...prev,
+      tools: prev.tools.map((tool) =>
+        tool.id === toolId ? { ...tool, active: !tool.active } : tool
+      ),
+    }));
+  };
+
+  const handleSave = () => {
+    onSave(settings);
+    onClose();
+  };
+
+  if (!node) return null;
 
   return (
     <div className="node-popup-overlay" onClick={onClose}>
@@ -416,51 +439,64 @@ const NodePopup = ({ node, onClose, onToolSelect }) => {
         </div>
 
         <div className="popup-content">
-          {/* Display configured tools */}
-          {node.configuredTools && node.configuredTools.length > 0 && (
-            <div className="configured-tools">
-              <h4>Configured Tools:</h4>
-              <div className="configured-list">
-                {node.configuredTools.map((tool) => (
-                  <div key={tool.id} className="configured-tool">
-                    <CheckCircle size={16} className="check-icon" />
-                    <span>{tool.label}</span>
+          {/* Credentials Section */}
+          {settings.creds &&
+            settings.creds.length > 0 &&
+            Object.keys(settings.creds[0]).length > 0 && (
+              <div className="popup-section">
+                <h4 className="section-title">
+                  <KeyRound size={16} /> Credentials
+                </h4>
+                {Object.keys(settings.creds[0]).map((key) => (
+                  <div className="form-group" key={key}>
+                    <label htmlFor={key}>{key.replace(/_/g, " ")}</label>
+                    <input
+                      type="password"
+                      id={key}
+                      value={settings.creds[0][key] || ""}
+                      placeholder={`Enter your ${key.replace(/_/g, " ")}`}
+                      onChange={(e) =>
+                        handleCredentialChange(key, e.target.value)
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+          {/* Tools Section */}
+          {settings.tools && settings.tools.length > 0 && (
+            <div className="popup-section">
+              <h4 className="section-title">
+                <Settings size={16} /> Tools
+              </h4>
+              <div className="tools-list">
+                {settings.tools.map((tool) => (
+                  <div key={tool.id} className="tool-item">
+                    <div className="tool-info">
+                      <div className="tool-label">{tool.label}</div>
+                      <div className="tool-description">{tool.description}</div>
+                    </div>
+                    <label className="toggle-switch">
+                      <input
+                        type="checkbox"
+                        checked={tool.active}
+                        onChange={() => handleToolToggle(tool.id)}
+                      />
+                      <span className="slider"></span>
+                    </label>
                   </div>
                 ))}
               </div>
             </div>
           )}
+        </div>
 
-          <div className="tools-grid">
-            {tools.map((tool) => {
-              const isConfigured = node.configuredTools?.some(
-                (ct) => ct.id === tool.id
-              );
-              return (
-                <button
-                  key={tool.id}
-                  className={`tool-btn ${isConfigured ? "configured" : ""}`}
-                  onClick={() => onToolSelect(tool, node)}
-                >
-                  <div className="tool-info">
-                    <div className="tool-label">
-                      {tool.label}
-                      {isConfigured && (
-                        <CheckCircle size={14} className="inline-check" />
-                      )}
-                    </div>
-                    <div className="tool-description">{tool.description}</div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {tools.length === 0 && (
-            <div className="no-tools">
-              <p>No tools available for this node type.</p>
-            </div>
-          )}
+        <div className="popup-footer">
+          <button className="btn-save-settings" onClick={handleSave}>
+            <Save size={16} />
+            Save Settings
+          </button>
         </div>
       </div>
     </div>
@@ -480,12 +516,16 @@ const WorkflowNode = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [clickCount, setClickCount] = useState(0);
   const nodeRef = useRef(null);
-  const clickTimer = useRef(null);
 
   const handleMouseDown = (e) => {
     if (e.target.classList.contains("connection-handle")) return;
+
+    // Allow double click to open popup
+    if (e.detail === 2) {
+      onNodeDoubleClick(node);
+      return;
+    }
 
     setIsDragging(true);
     const rect = nodeRef.current.getBoundingClientRect();
@@ -493,39 +533,16 @@ const WorkflowNode = ({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     });
-
-    setClickCount((prev) => prev + 1);
-
-    if (clickTimer.current) {
-      clearTimeout(clickTimer.current);
-    }
-
-    clickTimer.current = setTimeout(() => {
-      if (clickCount === 0) {
-        onNodeSelect(node.id);
-      }
-      setClickCount(0);
-    }, 300);
+    onNodeSelect(node.id);
   };
-
-  useEffect(() => {
-    if (clickCount === 2) {
-      clearTimeout(clickTimer.current);
-      setClickCount(0);
-      onNodeDoubleClick(node);
-    }
-  }, [clickCount, node, onNodeDoubleClick]);
 
   const handleMouseMove = useCallback(
     (e) => {
       if (!isDragging) return;
-
       const canvas = nodeRef.current.closest(".workflow-canvas");
       const canvasRect = canvas.getBoundingClientRect();
-
       const newX = e.clientX - canvasRect.left - dragOffset.x;
       const newY = e.clientY - canvasRect.top - dragOffset.y;
-
       onNodeMove(node.id, { x: Math.max(0, newX), y: Math.max(0, newY) });
     },
     [isDragging, dragOffset, node.id, onNodeMove]
@@ -547,10 +564,8 @@ const WorkflowNode = ({
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   const isSelected = selectedNode === node.id;
-  const hasConfiguredTools =
-    node.configuredTools && node.configuredTools.length > 0;
-
-  // Convert node color to RGB for the spotlight effect
+  const activeToolCount = node.tools?.filter((t) => t.active).length || 0;
+  const isConfigured = activeToolCount > 0;
   const spotlightRgb = hexToRgb(colorMap[node.color] || "#9ca3af");
 
   return (
@@ -558,13 +573,14 @@ const WorkflowNode = ({
       ref={nodeRef}
       className={`workflow-node ${isSelected ? "selected" : ""} ${
         isDragging ? "dragging" : ""
-      } ${hasConfiguredTools ? "configured" : ""}`}
+      } ${isConfigured ? "configured" : ""}`}
       style={{
         left: `${node.position.x}px`,
         top: `${node.position.y}px`,
         "--node-spotlight-rgb": spotlightRgb,
       }}
       onMouseDown={handleMouseDown}
+      onDoubleClick={() => onNodeDoubleClick(node)}
     >
       <div
         className="connection-handle input-handle"
@@ -573,7 +589,6 @@ const WorkflowNode = ({
           onConnectionEnd(node.id);
         }}
       />
-
       <div className="node-content">
         <div className={`node-icon ${node.color}`}>
           <node.icon size={16} />
@@ -581,15 +596,14 @@ const WorkflowNode = ({
         <div className="node-info">
           <div className="node-label">{node.label}</div>
           <div className="node-type">{node.type}</div>
-          {hasConfiguredTools && (
+          {isConfigured && (
             <div className="node-status">
               <CheckCircle size={12} />
-              <span>{node.configuredTools.length} configured</span>
+              <span>{activeToolCount} tools active</span>
             </div>
           )}
         </div>
       </div>
-
       <div
         className="connection-handle output-handle"
         onMouseDown={(e) => {
@@ -597,7 +611,6 @@ const WorkflowNode = ({
           onConnectionStart(node.id);
         }}
       />
-
       {isSelected && (
         <button
           className="delete-btn"
@@ -642,25 +655,13 @@ const ConnectionLine = ({ connection, nodes }) => {
 };
 
 export default function N8nWorkflowBuilder() {
-  const [nodes, setNodes] = useState([
-    {
-      node_id: "manual_trigger_1",
-      position: { x: 100, y: 100 },
-      type: "trigger",
-      label: "Manual Trigger",
-      icon: Play,
-      color: "teal",
-      tools: nodeTemplates.find((t) => t.node_id === "manual_trigger").tools,
-      configuredTools: [],
-    },
-  ]);
-
+  const [nodes, setNodes] = useState([]);
   const [connections, setConnections] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [nodeCounter, setNodeCounter] = useState({ whatsapp_trigger: 1 });
+  const [nodeCounter, setNodeCounter] = useState({});
   const [showNodePopup, setShowNodePopup] = useState(false);
   const [popupNode, setPopupNode] = useState(null);
   const [showChatWidget, setShowChatWidget] = useState(false);
@@ -668,27 +669,25 @@ export default function N8nWorkflowBuilder() {
 
   const addNode = useCallback(
     (template) => {
+      const currentCount = nodeCounter[template.node_id] || 0;
+      const newNodeId = `${template.node_id}_${currentCount + 1}`;
       setNodeCounter((prev) => ({
         ...prev,
-        [template.id]: (prev[template.id] || 0) + 1,
+        [template.node_id]: currentCount + 1,
       }));
 
-      const instanceCount = nodeCounter[template.id] || 0;
-      const nodeId = `${template.id}_${instanceCount + 1}`;
-
       const newNode = {
-        id: nodeId,
+        ...template, // Spread the entire template
+        id: newNodeId, // Override with a unique ID
         position: {
           x: Math.random() * 400 + 200,
           y: Math.random() * 200 + 150,
         },
-        label: template.label,
-        type: template.type,
-        icon: template.icon,
-        color: template.color,
-        tools: template.tools || [],
-        configuredTools: [],
       };
+      // Deep copy tools and creds to ensure they are unique instances per node
+      newNode.tools = JSON.parse(JSON.stringify(template.tools || []));
+      newNode.creds = JSON.parse(JSON.stringify(template.creds || []));
+
       setNodes((prev) => [...prev, newNode]);
     },
     [nodeCounter]
@@ -712,13 +711,16 @@ export default function N8nWorkflowBuilder() {
     setSelectedNode(node.id);
   }, []);
 
-  const onNodeDelete = useCallback((nodeId) => {
-    setNodes((prev) => prev.filter((node) => node.id !== nodeId));
-    setConnections((prev) =>
-      prev.filter((conn) => conn.from !== nodeId && conn.to !== nodeId)
-    );
-    setSelectedNode(null);
-  }, []);
+  const onNodeDelete = useCallback(
+    (nodeId) => {
+      setNodes((prev) => prev.filter((node) => node.id !== nodeId));
+      setConnections((prev) =>
+        prev.filter((conn) => conn.from !== nodeId && conn.to !== nodeId)
+      );
+      if (selectedNode === nodeId) setSelectedNode(null);
+    },
+    [selectedNode]
+  );
 
   const onConnectionStart = useCallback((nodeId) => {
     setConnectingFrom(nodeId);
@@ -727,9 +729,8 @@ export default function N8nWorkflowBuilder() {
   const onConnectionEnd = useCallback(
     (nodeId) => {
       if (connectingFrom && connectingFrom !== nodeId) {
-        const connectionId = `${connectingFrom}_to_${nodeId}`;
         const newConnection = {
-          id: connectionId,
+          id: `${connectingFrom}_to_${nodeId}`,
           from: connectingFrom,
           to: nodeId,
         };
@@ -744,8 +745,6 @@ export default function N8nWorkflowBuilder() {
     if (e.target === canvasRef.current) {
       setSelectedNode(null);
       setConnectingFrom(null);
-      setShowNodePopup(false);
-      setPopupNode(null);
     }
   }, []);
 
@@ -753,32 +752,11 @@ export default function N8nWorkflowBuilder() {
     (e) => {
       if (connectingFrom) {
         const rect = canvasRef.current.getBoundingClientRect();
-        setMousePos({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
-        });
+        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
       }
     },
     [connectingFrom]
   );
-
-  const runWorkflow = useCallback(() => {
-    setIsRunning(true);
-
-    const hasWebChatTrigger = nodes.some((node) =>
-      node.id.startsWith("webchat_trigger")
-    );
-
-    if (hasWebChatTrigger) {
-      setShowChatWidget(true);
-    } else {
-      alert("Workflow executed successfully! (No WebChat trigger found)");
-    }
-
-    setTimeout(() => {
-      setIsRunning(false);
-    }, 2000);
-  }, [nodes]);
 
   const saveWorkflow = useCallback(() => {
     const workflowData = {
@@ -787,44 +765,49 @@ export default function N8nWorkflowBuilder() {
       timestamp: new Date().toISOString(),
     };
     console.log("Saving workflow:", workflowData);
-    nodes.forEach((node) => {
-      if (node.configuredTools && node.configuredTools.length > 0) {
-        console.log(
-          `Node ${node.id} (${node.label}) configurations:`,
-          node.configuredTools
-        );
-      }
-    });
     alert("Workflow saved! Check console for details.");
   }, [nodes, connections]);
 
-  const handleToolSelect = useCallback((tool, node) => {
-    setNodes((prev) =>
-      prev.map((n) =>
-        n.id === node.id
-          ? {
-              ...n,
-              configuredTools: n.configuredTools?.some(
-                (ct) => ct.id === tool.id
-              )
-                ? n.configuredTools
-                : [...(n.configuredTools || []), tool],
-            }
-          : n
-      )
+  const handleSaveNodeSettings = useCallback((updatedNode) => {
+    // Find the original template to get the node_class
+    const template = nodeTemplates.find(
+      (t) => t.node_id === updatedNode.node_id
     );
+    if (!template) {
+      console.error("Could not find template for node:", updatedNode);
+      return;
+    }
 
+    const { node_class } = template;
+    const settingsPayload = {
+      node_class,
+      credentials: updatedNode.creds,
+      active_tools: updatedNode.tools
+        .filter((t) => t.active)
+        .map((t) => t.id || t.tool_func),
+    };
+
+    // --- SIMULATED API CALL ---
+    console.log(`🚀 API CALL: Saving settings for class '${node_class}'`);
+    console.log("Payload:", settingsPayload);
+    // Here you would typically make a fetch/axios call:
+    // fetch('/api/save-node-settings', { method: 'POST', body: JSON.stringify(settingsPayload) });
     alert(
-      `✅ ${tool.label} configured for ${node.label}!\n\n${tool.description}\n\nThis tool is now saved with the node.`
+      `Settings saved for ${updatedNode.label}. API call logged to console.`
     );
+    // --- END SIMULATED API CALL ---
+
+    setNodes((prevNodes) =>
+      prevNodes.map((n) => (n.id === updatedNode.id ? updatedNode : n))
+    );
+    setShowNodePopup(false);
+    setPopupNode(null);
   }, []);
 
   const closePopup = useCallback(() => {
     setShowNodePopup(false);
     setPopupNode(null);
   }, []);
-
-  const webChatTemplate = nodeTemplates.find((t) => t.id === "webchat_trigger");
 
   return (
     <div className="workflow-builder">
@@ -834,16 +817,13 @@ export default function N8nWorkflowBuilder() {
             <h1 className="title">Project Builder</h1>
             <div className="actions">
               <button
-                onClick={runWorkflow}
-                disabled={isRunning}
-                className={`btn btn-execute ${isRunning ? "disabled" : ""}`}
+                onClick={() => alert("Executing workflow!")}
+                className="btn btn-execute"
               >
-                <Play size={16} />
-                {isRunning ? "Running..." : "Execute"}
+                <Play size={16} /> Execute
               </button>
               <button onClick={saveWorkflow} className="btn btn-save">
-                <Save size={16} />
-                Save
+                <Save size={16} /> Save
               </button>
             </div>
           </div>
@@ -856,10 +836,10 @@ export default function N8nWorkflowBuilder() {
             <h2 className="sidebar-title">Triggers</h2>
             <div className="node-templates">
               {nodeTemplates
-                .filter((template) => template.type === "trigger")
+                .filter((t) => t.type === "trigger")
                 .map((template) => (
                   <button
-                    key={template.id}
+                    key={template.node_id}
                     onClick={() => addNode(template)}
                     className="template-btn"
                   >
@@ -874,15 +854,14 @@ export default function N8nWorkflowBuilder() {
                 ))}
             </div>
           </div>
-
           <div className="sidebar-section">
             <h2 className="sidebar-title">Agents</h2>
             <div className="node-templates">
               {nodeTemplates
-                .filter((template) => template.type === "agent")
+                .filter((t) => t.type === "agent")
                 .map((template) => (
                   <button
-                    key={template.id}
+                    key={template.node_id}
                     onClick={() => addNode(template)}
                     className="template-btn"
                   >
@@ -895,34 +874,6 @@ export default function N8nWorkflowBuilder() {
                     </div>
                   </button>
                 ))}
-            </div>
-          </div>
-
-          <div className="workflow-info">
-            <h3 className="info-title">Workflow Info</h3>
-            <div className="info-content">
-              <div>
-                <span>Triggers:</span>
-                <span>{nodes.filter((n) => n.type === "trigger").length}</span>
-              </div>
-              <div>
-                <span>Agents:</span>
-                <span>{nodes.filter((n) => n.type === "agent").length}</span>
-              </div>
-              <div>
-                <span>Connections:</span>
-                <span>{connections.length}</span>
-              </div>
-              <div>
-                <span>Status:</span>
-                <span>{isRunning ? "Running" : "Idle"}</span>
-              </div>
-              <div>
-                <span>Configured:</span>
-                <span>
-                  {nodes.filter((n) => n.configuredTools?.length > 0).length}
-                </span>
-              </div>
             </div>
           </div>
         </aside>
@@ -948,15 +899,9 @@ export default function N8nWorkflowBuilder() {
                   <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280" />
                 </marker>
               </defs>
-
-              {connections.map((connection) => (
-                <ConnectionLine
-                  key={connection.id}
-                  connection={connection}
-                  nodes={nodes}
-                />
+              {connections.map((conn) => (
+                <ConnectionLine key={conn.id} connection={conn} nodes={nodes} />
               ))}
-
               {connectingFrom && (
                 <line
                   x1={
@@ -973,7 +918,6 @@ export default function N8nWorkflowBuilder() {
                 />
               )}
             </svg>
-
             {nodes.map((node) => (
               <WorkflowNode
                 key={node.id}
@@ -988,7 +932,6 @@ export default function N8nWorkflowBuilder() {
               />
             ))}
           </div>
-
           <button
             onClick={() => setShowChatWidget(!showChatWidget)}
             className="fab"
@@ -1002,7 +945,7 @@ export default function N8nWorkflowBuilder() {
         <NodePopup
           node={popupNode}
           onClose={closePopup}
-          onToolSelect={handleToolSelect}
+          onSave={handleSaveNodeSettings}
         />
       )}
 
