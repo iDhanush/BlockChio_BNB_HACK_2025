@@ -8,7 +8,7 @@ class Node(BaseModel):
     purpose: str
     pos: dict[str, float]
     tools: list[dict[str, bool]]
-    creds: dict[str, str]
+    creds: list[dict[str, str]]
 
 
 class Conn(BaseModel):
