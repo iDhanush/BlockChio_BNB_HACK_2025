@@ -4,10 +4,10 @@ from langsmith import Client
 from langchain_core.tools import StructuredTool
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
+from agents.blockchain_agent.blockchian import get_balance, payment, mint_nft
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
-
-from agents.blockchain_agent.schemas import AgentState, TransferInput, NoInput
+from agents.blockchain_agent.schemas import AgentState, TransferInput, NoInput, NftInput
 from agents.llm import get_llm
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
@@ -18,7 +18,7 @@ class BlockchainAgent:
     def __init__(self):
         self.llm = get_llm()
         self.tools = []
-        self.wallet = 'xxx'
+        self.walletadress = 'xxx'
         self.agent = self.get_agent()
         self.struct_tools = self.StructTools(self)
 
@@ -26,23 +26,22 @@ class BlockchainAgent:
         def __init__(self, other_self):
             self.get_balance = StructuredTool.from_function(
                 name="get_balance",
-                coroutine=other_self.get_balance,
-                description="""Get the balance of a wallet""",
+                func=other_self.get_balance,
+                description="Get the balance of a wallet",
                 args_schema=NoInput
             )
             self.transfer = StructuredTool.from_function(
                 name="transfer",
-                coroutine=other_self.transfer,
-                description="""Transfer Crypto from one wallet to another""",
+                func=other_self.transfer,
+                description="Transfer Crypto from one wallet to another",
                 args_schema=TransferInput
             )
             self.mint_nft = StructuredTool.from_function(
                 name="mint_nft",
-                coroutine=other_self.mint_nft,
-                description="""Mint a NFT""",
-                args_schema=NoInput
+                func=other_self.mint_nft,
+                description="for Minting an NFT with url and gives the nft transaction hash",
+                args_schema=NftInput
             )
-
 
     def get_agent(self):
 
@@ -70,20 +69,17 @@ class BlockchainAgent:
         print(type(search_list), search_list)
         return "yoyoyo"
 
-
-    async def get_balance(self):
-        await asyncio.sleep(1)
+    @staticmethod
+    def get_balance():
+        return  get_balance()
 
     @staticmethod
-    async def transfer (amount: int, to: str):
-        await asyncio.sleep(1)
-        return f"You have transfered {amount} rs to {to}"
+    def transfer(to: str, amount):
+        return  payment(to, float(amount))
 
     @staticmethod
-    async def mint_nft():
-        await asyncio.sleep(1)
-        return "You have minted a nft"
-
+    def mint_nft(url: str):
+        return  mint_nft(url)
 
 
     @staticmethod
@@ -136,20 +132,21 @@ class BlockchainAgent:
 
 
 import asyncio
-# async def main():
-#     agent = BlockchainAgent()
-#     agent.tools.append(agent.struct_tools.get_balance)
-#
-#     # Sample query to test the agent with tool usage
-#     query = "How much is left?"
-#
-#     print(f"User: {query}")
-#     response = await agent.run(query)
-#
-#     print(f"Agent Response:\n{response}")
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
+async def main():
+    agent = BlockchainAgent()
+    agent.tools.append(agent.struct_tools.get_balance)
+    agent.tools.append(agent.struct_tools.transfer)
+    agent.tools.append(agent.struct_tools.mint_nft)
+    # Sample query to test the agent with tool usage
+    query = "whats my balance"
+
+    print(f"User: {query}")
+    response = await agent.run(query)
+
+    print(f"Agent Response:\n{response}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 
