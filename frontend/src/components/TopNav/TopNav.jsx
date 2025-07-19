@@ -57,7 +57,7 @@ const NavContent = memo(() => {
   // Memoize the background style to prevent unnecessary re-renders
   const backgroundStyle = useMemo(
     () => ({
-      background: pathname === "/" ? "#00000043" : "#101013",
+      background: pathname === "/" ? "transperent" : "#101013",
       border: pathname === "/" ? "none" : "",
     }),
     [pathname]
