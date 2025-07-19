@@ -32,6 +32,7 @@ class Tool(BaseModel):
 
 
 sample_workflow = WFlow(
+    wflow_name='str',
     user_id='',
     wflow_id='wfl_OLASjlajnfJ',
     nodes=[
