@@ -582,9 +582,15 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
 
 // Popup container
 .node-popup {
-  background: $bg-secondary;
-  border-radius: $border-radius-lg;
-  box-shadow: $shadow-lg;
+  background: rgba(208, 208, 208, 0.054);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1.4px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.141),
+    inset 0 1px 0 rgba(255, 255, 255, 0.038),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 0 20px 5px rgba(255, 255, 255, 0.028);
   width: 90%;
   max-width: 550px;
   max-height: 90vh;
@@ -683,8 +689,14 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        border-bottom: 1px solid $gray-100;
-        padding-bottom: 0.5rem;
+        background: var(--sec-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 10px;
+        // border-bottom: 1px solid $gray-100;
+        // padding-bottom: 0.5rem;
       }
     }
 
@@ -731,10 +743,11 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: $bg-tertiary;
+        background: var(--sec-bg);
         padding: 0.75rem 1rem;
         border-radius: $border-radius;
-        border: 1px solid $gray-100;
+        border: 0.5px solid var(--border);
+        cursor: pointer;
 
         .tool-info {
           .tool-label {
@@ -800,7 +813,7 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
   .popup-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid $gray-200;
-    background: $bg-secondary;
+    background: var(--primary-bg);
     display: flex;
     justify-content: flex-end;
     flex-shrink: 0;
@@ -809,18 +822,18 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
+      padding: 10px 20px;
       border: none;
-      border-radius: $border-radius;
-      background: $primary-color;
+      border-radius: 12px;
+      background: var(--brand);
       color: white;
       font-weight: 500;
-      font-size: 0.875rem;
+      font-size: 12px;
       cursor: pointer;
       transition: background-color 0.2s;
 
       &:hover {
-        background: darken($primary-color, 10%);
+        opacity: .9;
       }
     }
   }
