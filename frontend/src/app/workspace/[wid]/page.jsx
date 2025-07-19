@@ -19,6 +19,8 @@ import {
 
 import ChatWidget from "@/components/ui/ChatWidget/ChatWidget";
 import { AnimatePresence } from "framer-motion";
+import { updateWflow } from "@/utils/workflow";
+import { useParams } from "next/navigation";
 
 // Enhanced Node Templates with node_class and default tool states
 const nodeTemplates = [
@@ -31,18 +33,8 @@ const nodeTemplates = [
     color: "gray",
     node_class: "ManualTrigger",
     creds: [],
-    tools: [
-      {
-        id: "run_button",
-        label: "Run Manually",
-        description: "Start the workflow manually using this trigger",
-      },
-      {
-        id: "debug_mode",
-        label: "Debug Mode",
-        description: "Enable debug mode for testing this trigger",
-      },
-    ],
+    tools: [],
+    purpose: "",
   },
   {
     node_id: "whatsapp_trigger",
@@ -52,28 +44,8 @@ const nodeTemplates = [
     color: "green",
     node_class: "WhatsappTrigger",
     creds: [],
-    tools: [
-      {
-        id: "webhook",
-        label: "Webhook Settings",
-        description: "Configure webhook URL and parameters",
-      },
-      {
-        id: "auth",
-        label: "Authentication",
-        description: "Set up WhatsApp Business API credentials",
-      },
-      {
-        id: "filters",
-        label: "Message Filters",
-        description: "Filter incoming messages by content or sender",
-      },
-      {
-        id: "templates",
-        label: "Message Templates",
-        description: "Configure message templates",
-      },
-    ],
+    tools: [],
+    purpose: "",
   },
   {
     node_id: "telegram_trigger",
@@ -83,28 +55,8 @@ const nodeTemplates = [
     color: "blue",
     node_class: "TelegramTrigger",
     creds: [],
-    tools: [
-      {
-        id: "bot_token",
-        label: "Bot Token",
-        description: "Configure Telegram bot token",
-      },
-      {
-        id: "webhook",
-        label: "Webhook",
-        description: "Set up webhook for receiving messages",
-      },
-      {
-        id: "commands",
-        label: "Bot Commands",
-        description: "Configure bot commands and responses",
-      },
-      {
-        id: "filters",
-        label: "Message Filters",
-        description: "Filter messages by type or content",
-      },
-    ],
+    tools: [],
+    purpose: "",
   },
   {
     node_id: "webchat_trigger",
@@ -114,28 +66,8 @@ const nodeTemplates = [
     color: "purple",
     node_class: "WebchatTrigger",
     creds: [],
-    tools: [
-      {
-        id: "embed",
-        label: "Embed Code",
-        description: "Get embed code for your website",
-      },
-      {
-        id: "styling",
-        label: "Chat Styling",
-        description: "Customize chat widget appearance",
-      },
-      {
-        id: "analytics",
-        label: "Analytics",
-        description: "Track chat performance and metrics",
-      },
-      {
-        id: "notifications",
-        label: "Notifications",
-        description: "Configure notification settings",
-      },
-    ],
+    tools: [],
+    purpose: "",
   },
 
   // Agents
@@ -148,26 +80,6 @@ const nodeTemplates = [
     node_class: "BlockchainAgent",
     creds: [],
     tools: [
-      {
-        id: "wallet",
-        label: "Wallet Connection",
-        description: "Connect to blockchain wallets",
-      },
-      {
-        id: "contracts",
-        label: "Smart Contracts",
-        description: "Manage smart contract interactions",
-      },
-      {
-        id: "transactions",
-        label: "Transaction Monitor",
-        description: "Monitor blockchain transactions",
-      },
-      {
-        id: "networks",
-        label: "Network Settings",
-        description: "Configure blockchain networks",
-      },
       {
         label: "Send Transaction",
         description: "Send a transaction",
@@ -187,6 +99,7 @@ const nodeTemplates = [
         active: true,
       },
     ],
+    purpose: "",
   },
   {
     node_id: "image_generation_agent",
@@ -198,32 +111,13 @@ const nodeTemplates = [
     creds: [],
     tools: [
       {
-        id: "models",
-        label: "AI Models",
-        description: "Select and configure AI models",
-      },
-      {
-        id: "prompts",
-        label: "Prompt Templates",
-        description: "Create and manage prompt templates",
-      },
-      {
-        id: "styles",
-        label: "Style Settings",
-        description: "Configure image styles and parameters",
-      },
-      {
-        id: "processing",
-        label: "Image Processing",
-        description: "Post-processing and optimization",
-      },
-      {
         label: "Generate Image",
         description: "Generate an image",
         tool_func: "generate_image",
         active: true,
       },
     ],
+    purpose: "",
   },
   {
     node_id: "whatsapp_agent",
@@ -235,28 +129,6 @@ const nodeTemplates = [
     creds: [],
     tools: [
       {
-        id: "send_template",
-        label: "Send Template Message",
-        description: "Send pre-approved message templates",
-      },
-      {
-        id: "manage_contacts",
-        label: "Manage Contacts",
-        description: "Add, update, or remove contacts",
-      },
-      {
-        id: "message_status",
-        label: "Message Status",
-        description:
-          "Track the status of sent messages (sent, delivered, read)",
-      },
-      {
-        id: "api_health",
-        label: "API Health",
-        description:
-          "Check the health and status of the WhatsApp API connection",
-      },
-      {
         label: "Send Message",
         description: "Send a transaction",
         tool_func: "send_message",
@@ -269,6 +141,7 @@ const nodeTemplates = [
         active: true,
       },
     ],
+    purpose: "",
   },
   {
     node_id: "telegram_agent",
@@ -280,26 +153,6 @@ const nodeTemplates = [
     creds: [{ bot_token: null }],
     tools: [
       {
-        id: "send_message",
-        label: "Send Message",
-        description: "Send text, media, or interactive messages",
-      },
-      {
-        id: "manage_chat",
-        label: "Manage Chat",
-        description: "Manage chat settings, members, and permissions",
-      },
-      {
-        id: "get_updates",
-        label: "Get Updates",
-        description: "Fetch real-time updates and message history",
-      },
-      {
-        id: "api_settings",
-        label: "API Settings",
-        description: "Configure advanced API parameters",
-      },
-      {
         label: "Send Message",
         description: "Send a transaction",
         tool_func: "send_message",
@@ -312,6 +165,7 @@ const nodeTemplates = [
         active: true,
       },
     ],
+    purpose: "",
   },
   {
     node_id: "ai_assistant_agent",
@@ -322,26 +176,6 @@ const nodeTemplates = [
     node_class: "ConversationAgent",
     creds: [],
     tools: [
-      {
-        id: "capabilities",
-        label: "AI Capabilities",
-        description: "Configure AI assistant features",
-      },
-      {
-        id: "integrations",
-        label: "Integrations",
-        description: "Connect with external services",
-      },
-      {
-        id: "scheduling",
-        label: "Task Scheduling",
-        description: "Schedule automated tasks",
-      },
-      {
-        id: "security",
-        label: "Security Settings",
-        description: "Configure security and permissions",
-      },
       {
         label: "RAG",
         description: "Send a transaction",
@@ -357,16 +191,17 @@ const nodeTemplates = [
       {
         label: "Google Search Tool",
         description: "Send a transaction",
-        tool_func: "google_search",
+        tool_func: "Google Search",
         active: true,
       },
       {
-        label: "Youtube Search Tool",
+        label: "Youtube Tool",
         description: "Send a transaction",
-        tool_func: "youtube_search",
+        tool_func: "Youtube",
         active: true,
       },
     ],
+    purpose: "",
   },
 ];
 
@@ -408,7 +243,7 @@ const NodePopup = ({ node, onClose, onSave }) => {
     setSettings((prev) => ({
       ...prev,
       tools: prev.tools.map((tool) =>
-        tool.id === toolId ? { ...tool, active: !tool.active } : tool
+        tool.tool_func === toolId ? { ...tool, active: !tool.active } : tool
       ),
     }));
   };
@@ -472,7 +307,7 @@ const NodePopup = ({ node, onClose, onSave }) => {
               </h4> */}
               <div className="tools-list">
                 {settings.tools.map((tool) => (
-                  <div key={tool.id} className="tool-item">
+                  <div key={tool.tool_func} className="tool-item">
                     <div className="tool-info">
                       <div className="tool-label">{tool.label}</div>
                       <div className="tool-description">{tool.description}</div>
@@ -481,7 +316,7 @@ const NodePopup = ({ node, onClose, onSave }) => {
                       <input
                         type="checkbox"
                         checked={tool.active}
-                        onChange={() => handleToolToggle(tool.id)}
+                        onChange={() => handleToolToggle(tool.tool_func)}
                       />
                       <span className="slider"></span>
                     </label>
@@ -631,8 +466,8 @@ const WorkflowNode = ({
 
 // Connection Line Component
 const ConnectionLine = ({ connection, nodes }) => {
-  const fromNode = nodes.find((n) => n.id === connection.from);
-  const toNode = nodes.find((n) => n.id === connection.to);
+  const fromNode = nodes.find((n) => n.id === connection.from_node);
+  const toNode = nodes.find((n) => n.id === connection.to_node);
 
   if (!fromNode || !toNode) return null;
 
@@ -669,6 +504,9 @@ export default function N8nWorkflowBuilder() {
   const [popupNode, setPopupNode] = useState(null);
   const [showChatWidget, setShowChatWidget] = useState(false);
   const canvasRef = useRef(null);
+  const params = useParams();
+
+  const [workflowId, setWorkflowid] = useState(params.wid);
 
   const addNode = useCallback(
     (template) => {
@@ -718,7 +556,7 @@ export default function N8nWorkflowBuilder() {
     (nodeId) => {
       setNodes((prev) => prev.filter((node) => node.id !== nodeId));
       setConnections((prev) =>
-        prev.filter((conn) => conn.from !== nodeId && conn.to !== nodeId)
+        prev.filter((conn) => conn.from_node !== nodeId && conn.to_node !== nodeId)
       );
       if (selectedNode === nodeId) setSelectedNode(null);
     },
@@ -732,16 +570,27 @@ export default function N8nWorkflowBuilder() {
   const onConnectionEnd = useCallback(
     (nodeId) => {
       if (connectingFrom && connectingFrom !== nodeId) {
+        // PREVENT DUPLICATE CONNECTIONS (Good Practice)
+        const connectionExists = connections.some(
+          (conn) => conn.from_node === connectingFrom && conn.to_node === nodeId
+        );
+
+        if (connectionExists) {
+          setConnectingFrom(null);
+          return; // Exit if this connection already exists
+        }
+
+        // FIX: Create a guaranteed unique ID and use consistent property names
         const newConnection = {
-          id: `${connectingFrom}_to_${nodeId}`,
-          from: connectingFrom,
-          to: nodeId,
+          conn_id: `${connectingFrom}_to_${nodeId}_${Date.now()}`, // Use 'id' and add timestamp
+          from_node: connectingFrom, // Use 'from'
+          to_node: nodeId, // Use 'to'
         };
         setConnections((prev) => [...prev, newConnection]);
       }
       setConnectingFrom(null);
     },
-    [connectingFrom]
+    [connectingFrom, connections] // Add 'connections' to the dependency array
   );
 
   const handleCanvasClick = useCallback((e) => {
@@ -761,13 +610,13 @@ export default function N8nWorkflowBuilder() {
     [connectingFrom]
   );
 
-  const saveWorkflow = useCallback(() => {
+  const saveWorkflow = useCallback(async () => {
     const workflowData = {
       nodes,
       connections,
-      timestamp: new Date().toISOString(),
     };
     console.log("Saving workflow:", workflowData);
+    const res = await updateWflow(workflowId, workflowData);
     alert("Workflow saved! Check console for details.");
   }, [nodes, connections]);
 
@@ -787,21 +636,33 @@ export default function N8nWorkflowBuilder() {
       credentials: updatedNode.creds,
       active_tools: updatedNode.tools
         .filter((t) => t.active)
-        .map((t) => t.id || t.tool_func),
+        .map((t) => t.tool_func),
     };
 
-    // --- SIMULATED API CALL ---
-    console.log(`🚀 API CALL: Saving settings for class '${node_class}'`);
-    console.log("Payload:", settingsPayload);
-    // Here you would typically make a fetch/axios call:
-    // fetch('/api/save-node-settings', { method: 'POST', body: JSON.stringify(settingsPayload) });
-    alert(
-      `Settings saved for ${updatedNode.label}. API call logged to console.`
-    );
-    // --- END SIMULATED API CALL ---
+    // // --- SIMULATED API CALL ---
+    // console.log(`🚀 API CALL: Saving settings for class '${node_class}'`);
+    // console.log("Payload:", settingsPayload);
+    // // Here you would typically make a fetch/axios call:
+    // // fetch('/api/save-node-settings', { method: 'POST', body: JSON.stringify(settingsPayload) });
+    // alert(
+    //   `Settings saved for ${updatedNode.label}. API call logged to console.`
+    // );
+    // // --- END SIMULATED API CALL ---
 
     setNodes((prevNodes) =>
-      prevNodes.map((n) => (n.id === updatedNode.id ? updatedNode : n))
+      prevNodes.map((n) => {
+        if (n.id === updatedNode.id) {
+          // THIS IS THE FIX:
+          // Preserve the original node's properties (like the icon component)
+          // and only overwrite the properties that were changed in the popup.
+          return {
+            ...n,
+            creds: updatedNode.creds,
+            tools: updatedNode.tools,
+          };
+        }
+        return n;
+      })
     );
     setShowNodePopup(false);
     setPopupNode(null);
@@ -903,7 +764,11 @@ export default function N8nWorkflowBuilder() {
                 </marker>
               </defs>
               {connections.map((conn) => (
-                <ConnectionLine key={conn.id} connection={conn} nodes={nodes} />
+                <ConnectionLine
+                  key={conn.conn_id}
+                  connection={conn}
+                  nodes={nodes}
+                />
               ))}
               {connectingFrom && (
                 <line
