@@ -94,6 +94,12 @@
     font-size: 20px;
     color: var(--btn-txt);
   }
+  .workflow-cards{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-area: 20px;
+  }
 }
 
 // ... your existing SCSS styles ...
