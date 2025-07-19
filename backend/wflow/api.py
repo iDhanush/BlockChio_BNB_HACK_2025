@@ -20,23 +20,26 @@ async def create_wflow(wflow_payload: WFlowPayload, user: User = Depends(get_use
     await Var.db.create_wflow(wflow_data)
     return wflow_data
 
+
 @wflow_router.get('/{wflow_id}')
-async def get_wflow(wflow_id):
+async def get_wflow(wflow_id, _user: User = Depends(get_user)):
     res = await Var.db.get_wflow(wflow_id)
     return res
 
+
 @wflow_router.put('/{wflow_id}')
-async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
+async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload, _user: User = Depends(get_user)):
     await Var.db.set_wflow(wflow_id, wflow_payload)
 
 
 @wflow_router.put('/{wflow_id}')
-async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
+async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload, _user: User = Depends(get_user)):
     await Var.db.set_wflow(wflow_id, wflow_payload)
+
 
 @wflow_router.get('/{wflow_id}/execute')
-async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload):
-    # await Var.db.set_wflow(wflow_id, wflow_payload)
-    # wflow_data = await Var.db.get_wflow(wflow_id)
-    executor = WorkflowExecutor(workflow=sample_workflow)
+async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload, _user: User = Depends(get_user)):
+    await Var.db.set_wflow(wflow_id, wflow_payload)
+    wflow_data = await Var.db.get_wflow(wflow_id)
+    executor = WorkflowExecutor(workflow=wflow_data)
     await executor.execute("create a cute cat")
