@@ -70,3 +70,7 @@ sample_workflow = WFlow(
            ]
 )
 print(sample_workflow.model_dump())
+
+class WFlowPayload(BaseModel):
+    nodes: list[Node]
+    conns: list[Conn]

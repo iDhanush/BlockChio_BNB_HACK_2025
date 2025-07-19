@@ -2,7 +2,7 @@ import os
 from pytz import timezone
 from motor import motor_asyncio
 
-from wflow.schemas import WFlow
+from wflow.schemas import WFlow, WFlowPayload
 
 ist = timezone("Asia/Kolkata")
 
@@ -17,5 +17,8 @@ class DataBase:
     async def get_wflow(self, wflow_id: str):
         await self.wflows.find_one({'wflow_id': wflow_id})
 
-    async def set_wflow(self, wflow_id: str, wflow: WFlow):
+    async def set_wflow(self, wflow_id: str, wflow: WFlowPayload):
         await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)
+
+    async def create_wflow(self, wflow: WFlow):
+        await self.wflows.insert_one({'$set': wflow.model_dump()}, upsert=True)
