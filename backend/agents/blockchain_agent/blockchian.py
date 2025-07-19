@@ -19,7 +19,7 @@ def get_account() -> LocalAccount:
 
 account = get_account()
 
-p = project.load('brown')
+p = project.load('agents/blockchain_agent/brown')
 FundMe = p.FundMe
 SimpleCollectible = p.SimpleCollectible
 network.connect('bsc-testnet')
