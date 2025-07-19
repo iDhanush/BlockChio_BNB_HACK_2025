@@ -2,7 +2,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import "./app.scss";
 import {
-  Plus,
   Play,
   Save,
   Settings,
@@ -12,26 +11,8 @@ import {
   Bot,
   Image,
   MessageSquare,
-  Rocket,
   Brain,
   X,
-  Link,
-  Key,
-  Database,
-  FileText,
-  Zap,
-  Code,
-  Webhook,
-  Mail,
-  Calendar,
-  Filter,
-  MapPin,
-  Cloud,
-  Shield,
-  Monitor,
-  Palette,
-  Cpu,
-  Activity,
   CheckCircle,
 } from "lucide-react";
 
@@ -45,7 +26,7 @@ const nodeTemplates = [
     type: "trigger",
     label: "Manual Trigger",
     icon: Play,
-    color: "gray",
+    color: "teal",
     node_class: "ManualTrigger",
     creds: [],
     tools: [
@@ -663,13 +644,13 @@ const ConnectionLine = ({ connection, nodes }) => {
 export default function N8nWorkflowBuilder() {
   const [nodes, setNodes] = useState([
     {
-      node_id: "whatsapp_trigger_1",
+      node_id: "manual_trigger_1",
       position: { x: 100, y: 100 },
-      label: "WhatsApp Trigger",
       type: "trigger",
-      icon: MessageCircle,
-      color: "green",
-      tools: nodeTemplates.find((t) => t.node_id === "whatsapp_trigger").tools,
+      label: "Manual Trigger",
+      icon: Play,
+      color: "teal",
+      tools: nodeTemplates.find((t) => t.node_id === "manual_trigger").tools,
       configuredTools: [],
     },
   ]);
