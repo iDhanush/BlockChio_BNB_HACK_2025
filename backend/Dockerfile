@@ -16,7 +16,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Install eth-brownie (should not be in CMD)
 RUN pip install eth-brownie
-
+RUN brownie networks add BinanceSmartChain bsc-testnet host=https://bsc-testnet-dataseed.bnbchain.org chainid=97 explorer=https://testnet.bscscan.com
 COPY . .
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
