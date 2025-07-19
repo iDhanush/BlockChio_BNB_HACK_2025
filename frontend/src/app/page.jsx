@@ -18,7 +18,10 @@ const page = () => {
               Start building powerful AI workflows by
               <br /> adding your first project.
             </div>
-            
+            <div className="hero-btns">
+              <div className="view-btn">View Templates</div>
+              <div className="workflow-btn">Build Now</div>
+            </div>
           </div>
         </div>
 
