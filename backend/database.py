@@ -34,7 +34,7 @@ class DataBase:
         wflow_data = wflow.model_dump()
         if not wflow.wflow_name:
             wflow_data.pop('wflow_name')
-        await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow.model_dump()}, upsert=True)
+        await self.wflows.update_one({'wflow_id': wflow_id}, {'$set': wflow_data}, upsert=True)
 
     async def create_wflow(self, wflow: WFlow):
         await self.wflows.insert_one(wflow.model_dump())
