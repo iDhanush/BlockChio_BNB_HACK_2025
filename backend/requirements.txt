@@ -23,5 +23,5 @@ langchain-community
 langchain-google-community
 starlette
 eth-brownie
-PyYAML>=6.0
+PyYAML==6.0.2
 
