@@ -18,7 +18,7 @@ class WorkflowExecutor:
     def __init__(self, workflow: WorkFlow):
         self.workflow = workflow
         # Create a quick lookup map for nodes by their ID
-        self.node_map = {node.id: node for node in self.workflow.nodes}
+        self.node_map = {node.node_id: node for node in self.workflow.nodes}
         # Create an adjacency list to represent the graph's connections
         self.adjacency_list = collections.defaultdict(list)
         for conn in self.workflow.conns:
@@ -66,14 +66,14 @@ class WorkflowExecutor:
             raise ValueError("No trigger node found in workflow")
 
         print(f"--- Starting Workflow Execution ---")
-        print(f"Trigger: {trigger_node.id}")
+        print(f"Trigger: {trigger_node.node_id}")
         print(f"Initial Input: {initial_input}\n")
 
         # The "result" of the trigger is the initial input
-        self.execution_results[trigger_node.id] = initial_input
+        self.execution_results[trigger_node.node_id] = initial_input
 
         # Get the first layer of nodes to process (nodes connected to the trigger)
-        nodes_to_process = self.adjacency_list.get(trigger_node.id, [])
+        nodes_to_process = self.adjacency_list.get(trigger_node.node_id, [])
 
         # Process the graph layer by layer
         while nodes_to_process:

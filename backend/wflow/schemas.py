@@ -3,7 +3,7 @@ from pydantic import BaseModel, constr
 
 class Node(BaseModel):
     type: constr(pattern='trigger|agent')
-    id: str
+    node_id: str
     node_class: str
     purpose: str
     pos: dict[str, float]
@@ -12,13 +12,13 @@ class Node(BaseModel):
 
 
 class Conn(BaseModel):
-    id: str
+    conn_id: str
     from_node: str
     to_node: str
 
 
 class WorkFlow(BaseModel):
-    id: str
+    workflow_id: str
     user_id: str
     nodes: list[Node]
     conns: list[Conn]
@@ -26,10 +26,10 @@ class WorkFlow(BaseModel):
 
 sample_workflow = WorkFlow(
     user_id='',
-    id='wfl_OLASjlajnfJ',
+    workflow_id='wfl_OLASjlajnfJ',
     nodes=[
         Node(
-            id="whatsapp_trigger_1",
+            node_id="whatsapp_trigger_1",
             purpose="",
             type="trigger",
             node_class="WhatsappTrigger",
@@ -38,7 +38,7 @@ sample_workflow = WorkFlow(
             cred={},
         ),
         Node(
-            id="image_agent_1",
+            node_id="image_agent_1",
             type="agent",
             node_class="ImageAgent",
             purpose="Generate Image for the prompt given",
@@ -47,7 +47,7 @@ sample_workflow = WorkFlow(
             cred={},
         ),
         Node(
-            id="telegram_agent_1",
+            node_id="telegram_agent_1",
             type="agent",
             node_class="TelegramAgent",
             purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
@@ -56,7 +56,7 @@ sample_workflow = WorkFlow(
             cred={},
         ),
         Node(
-            id="whatsapp_agent_1",
+            node_id="whatsapp_agent_1",
             type="agent",
             node_class="WhatsappAgent",
             purpose="if the image generated is of a dog then send it to the number 9995539972 else do nothing",
@@ -64,9 +64,9 @@ sample_workflow = WorkFlow(
             tools=[{"send_message": True}, {"send_image": True}], cred={},
         )
     ],
-    conns=[Conn(id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
-           Conn(id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
-           Conn(id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
+    conns=[Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
+           Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
+           Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
            ]
 )
 print(sample_workflow.model_dump())
