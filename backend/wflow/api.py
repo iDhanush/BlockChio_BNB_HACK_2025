@@ -7,6 +7,8 @@ from wflow.schemas import WFlow, WFlowPayload
 from utils.tokenizer import invoke_uid
 from fastapi import Depends
 
+from wflow.wflow import WorkflowExecutor
+
 wflow_router = APIRouter(prefix='/wflow')
 
 
@@ -33,3 +35,6 @@ async def update_wflow(wflow_id: str, wflow_payload: WFlowPayload):
 @wflow_router.get('/{wflow_id}/execute')
 async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload):
     await Var.db.set_wflow(wflow_id, wflow_payload)
+    wflow_data = await Var.db.get_wflow(wflow_id)
+    executor = WorkflowExecutor(workflow=wflow_data)
+    await executor.execute("create a cute cat")
