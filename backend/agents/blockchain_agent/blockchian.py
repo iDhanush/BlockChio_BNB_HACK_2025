@@ -156,11 +156,18 @@ async def main():
     # balance = get_balance()
     # print(balance)
 
-
-p = project.load('agents/blockchain_agent/brown')
-network.connect('bsc-testnet')
-FundMe = p.FundMe
-SimpleCollectible = p.SimpleCollectible
-account = get_account()
-# Run the main async function
-asyncio.run(main())
+#
+# p = project.load('agents/blockchain_agent/brown')
+# network.connect('bsc-testnet')
+# FundMe = p.FundMe
+# SimpleCollectible = p.SimpleCollectible
+# account = get_account()
+# # Run the main async function
+# # asyncio.run(main())
+#
+# account = get_account()
+#     network_name = network.show_active()
+#
+#     # Initialize contracts using the new DB-driven function
+# global fundme, simple
+# fundme, simple = await initialize_contracts_from_db(account, network_name)
