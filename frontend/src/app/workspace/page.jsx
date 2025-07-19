@@ -13,7 +13,7 @@ const page = () => {
         `${baseUrl}/wflow/`,
         {
           nodes: [],
-          conns: [],
+          connections: [],
         },
         {
           withCredentials: true,

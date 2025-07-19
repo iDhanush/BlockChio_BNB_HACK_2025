@@ -19,7 +19,7 @@ import {
 
 import ChatWidget from "@/components/ui/ChatWidget/ChatWidget";
 import { AnimatePresence } from "framer-motion";
-import { updateWflow } from "@/utils/workflow";
+import { updateWflow, getWflow } from "@/utils/workflow"; // Ensure getWflow is imported
 import { useParams } from "next/navigation";
 
 // Enhanced Node Templates with node_class and default tool states
@@ -279,9 +279,6 @@ const NodePopup = ({ node, onClose, onSave }) => {
             settings.creds.length > 0 &&
             Object.keys(settings.creds[0]).length > 0 && (
               <div className="popup-section">
-                {/* <h4 className="section-title">
-                  <KeyRound size={16} /> Credentials
-                </h4> */}
                 {Object.keys(settings.creds[0]).map((key) => (
                   <div className="form-group" key={key}>
                     <label htmlFor={key}>{key.replace(/_/g, " ")}</label>
@@ -302,9 +299,6 @@ const NodePopup = ({ node, onClose, onSave }) => {
           {/* Tools Section */}
           {settings.tools && settings.tools.length > 0 && (
             <div className="popup-section">
-              {/* <h4 className="section-title">
-                <Settings size={16} /> Tools
-              </h4> */}
               <div className="tools-list">
                 {settings.tools.map((tool) => (
                   <div key={tool.tool_func} className="tool-item">
@@ -359,7 +353,6 @@ const WorkflowNode = ({
   const handleMouseDown = (e) => {
     if (e.target.classList.contains("connection-handle")) return;
 
-    // Allow double click to open popup
     if (e.detail === 2) {
       onNodeDoubleClick(node);
       return;
@@ -402,8 +395,6 @@ const WorkflowNode = ({
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   const isSelected = selectedNode === node.id;
-  const activeToolCount = node.tools?.filter((t) => t.active).length || 0;
-  const isConfigured = activeToolCount > 0;
   const spotlightRgb = hexToRgb(colorMap[node.color] || "#9ca3af");
 
   return (
@@ -411,7 +402,7 @@ const WorkflowNode = ({
       ref={nodeRef}
       className={`workflow-node ${isSelected ? "selected" : ""} ${
         isDragging ? "dragging" : ""
-      } ${isConfigured ? "configured" : ""}`}
+      }`}
       style={{
         left: `${node.position.x}px`,
         top: `${node.position.y}px`,
@@ -434,12 +425,6 @@ const WorkflowNode = ({
         <div className="node-info">
           <div className="node-label">{node.label}</div>
           <div className="node-type">{node.type}</div>
-          {/* {isConfigured && (
-            <div className="node-status">
-              <CheckCircle size={12} />
-              <span>{activeToolCount} tools active</span>
-            </div>
-          )} */}
         </div>
       </div>
       <div
@@ -496,7 +481,6 @@ export default function N8nWorkflowBuilder() {
   const [nodes, setNodes] = useState([]);
   const [connections, setConnections] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
-  const [isRunning, setIsRunning] = useState(false);
   const [connectingFrom, setConnectingFrom] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [nodeCounter, setNodeCounter] = useState({});
@@ -508,6 +492,52 @@ export default function N8nWorkflowBuilder() {
 
   const [workflowId, setWorkflowid] = useState(params.wid);
 
+  // <<< START: UPDATED WORKFLOW LOADING LOGIC >>>
+  useEffect(() => {
+    const loadWorkflow = async () => {
+      if (!workflowId) return;
+
+      try {
+        const savedWorkflow = await getWflow(workflowId);
+        if (!savedWorkflow || !savedWorkflow.nodes) {
+          console.log("No saved workflow found or data is invalid.");
+          return;
+        }
+
+        // This counter will track the number of times we've seen each node type
+        // to assign the correct ID number (e.g., manual_trigger_1, manual_trigger_2)
+        const tempCounters = {};
+
+        const rehydratedNodes = savedWorkflow.nodes
+          .map((node) => {
+            const template = nodeTemplates.find(
+              (t) => t.node_id === node.node_id
+            );
+            if (!template) return null;
+
+            // **FIX**: Generate the unique ID here
+            const currentCount = (tempCounters[node.node_id] || 0) + 1;
+            tempCounters[node.node_id] = currentCount;
+            const uniqueId = `${node.node_id}_${currentCount}`;
+
+            // Merge template (for icon, label), saved node (for position), and add the new ID
+            return { ...template, ...node, id: uniqueId };
+          })
+          .filter(Boolean); // Filter out any nulls
+
+        // Set the state with the newly processed data
+        setNodes(rehydratedNodes);
+        setConnections(savedWorkflow.connections || []);
+        setNodeCounter(tempCounters); // Use the counter we just built
+      } catch (error) {
+        console.error("Failed to load workflow:", error);
+      }
+    };
+
+    loadWorkflow();
+  }, [workflowId]); // Rerun effect if the workflowId changes
+  // <<< END: UPDATED WORKFLOW LOADING LOGIC >>>
+
   const addNode = useCallback(
     (template) => {
       const currentCount = nodeCounter[template.node_id] || 0;
@@ -518,14 +548,14 @@ export default function N8nWorkflowBuilder() {
       }));
 
       const newNode = {
-        ...template, // Spread the entire template
-        id: newNodeId, // Override with a unique ID
+        ...template,
+        id: newNodeId,
         position: {
           x: Math.random() * 400 + 200,
           y: Math.random() * 200 + 150,
         },
       };
-      // Deep copy tools and creds to ensure they are unique instances per node
+
       newNode.tools = JSON.parse(JSON.stringify(template.tools || []));
       newNode.creds = JSON.parse(JSON.stringify(template.creds || []));
 
@@ -556,7 +586,9 @@ export default function N8nWorkflowBuilder() {
     (nodeId) => {
       setNodes((prev) => prev.filter((node) => node.id !== nodeId));
       setConnections((prev) =>
-        prev.filter((conn) => conn.from_node !== nodeId && conn.to_node !== nodeId)
+        prev.filter(
+          (conn) => conn.from_node !== nodeId && conn.to_node !== nodeId
+        )
       );
       if (selectedNode === nodeId) setSelectedNode(null);
     },
@@ -570,27 +602,25 @@ export default function N8nWorkflowBuilder() {
   const onConnectionEnd = useCallback(
     (nodeId) => {
       if (connectingFrom && connectingFrom !== nodeId) {
-        // PREVENT DUPLICATE CONNECTIONS (Good Practice)
         const connectionExists = connections.some(
           (conn) => conn.from_node === connectingFrom && conn.to_node === nodeId
         );
 
         if (connectionExists) {
           setConnectingFrom(null);
-          return; // Exit if this connection already exists
+          return;
         }
 
-        // FIX: Create a guaranteed unique ID and use consistent property names
         const newConnection = {
-          conn_id: `${connectingFrom}_to_${nodeId}_${Date.now()}`, // Use 'id' and add timestamp
-          from_node: connectingFrom, // Use 'from'
-          to_node: nodeId, // Use 'to'
+          conn_id: `${connectingFrom}_to_${nodeId}_${Date.now()}`,
+          from_node: connectingFrom,
+          to_node: nodeId,
         };
         setConnections((prev) => [...prev, newConnection]);
       }
       setConnectingFrom(null);
     },
-    [connectingFrom, connections] // Add 'connections' to the dependency array
+    [connectingFrom, connections]
   );
 
   const handleCanvasClick = useCallback((e) => {
@@ -616,45 +646,14 @@ export default function N8nWorkflowBuilder() {
       connections,
     };
     console.log("Saving workflow:", workflowData);
-    const res = await updateWflow(workflowId, workflowData);
+    await updateWflow(workflowId, workflowData);
     alert("Workflow saved! Check console for details.");
-  }, [nodes, connections]);
+  }, [nodes, connections, workflowId]);
 
   const handleSaveNodeSettings = useCallback((updatedNode) => {
-    // Find the original template to get the node_class
-    const template = nodeTemplates.find(
-      (t) => t.node_id === updatedNode.node_id
-    );
-    if (!template) {
-      console.error("Could not find template for node:", updatedNode);
-      return;
-    }
-
-    const { node_class } = template;
-    const settingsPayload = {
-      node_class,
-      credentials: updatedNode.creds,
-      active_tools: updatedNode.tools
-        .filter((t) => t.active)
-        .map((t) => t.tool_func),
-    };
-
-    // // --- SIMULATED API CALL ---
-    // console.log(`🚀 API CALL: Saving settings for class '${node_class}'`);
-    // console.log("Payload:", settingsPayload);
-    // // Here you would typically make a fetch/axios call:
-    // // fetch('/api/save-node-settings', { method: 'POST', body: JSON.stringify(settingsPayload) });
-    // alert(
-    //   `Settings saved for ${updatedNode.label}. API call logged to console.`
-    // );
-    // // --- END SIMULATED API CALL ---
-
     setNodes((prevNodes) =>
       prevNodes.map((n) => {
         if (n.id === updatedNode.id) {
-          // THIS IS THE FIX:
-          // Preserve the original node's properties (like the icon component)
-          // and only overwrite the properties that were changed in the popup.
           return {
             ...n,
             creds: updatedNode.creds,
