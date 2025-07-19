@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+
+COPY brownie-req.txt brownie-req.txt
 RUN pip install -r brownie-req.txt
 COPY . .
 
