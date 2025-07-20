@@ -1,310 +1,310 @@
-// .market-sec {
-//   background: var(--primary-bg);
-//   width: 100%;
-//   height: 100vh;
-//   overflow: hidden;
-//   overflow-y: auto;
-//   padding: 20px;
-//   display: flex;
-//   align-items: center;
+.market-sec {
+  background: var(--primary-bg);
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  align-items: center;
 
-//   display: flex;
-//   flex-direction: column;
-//   gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
-//   .sec-head {
-//     font-family: var(--myFont);
-//     font-size: 50px;
-//     color: var(--primary-txt);
-//     font-weight: 300;
-//   }
+  .sec-head {
+    font-family: var(--myFont);
+    font-size: 50px;
+    color: var(--primary-txt);
+    font-weight: 300;
+  }
 
-//   .no-projects {
-//     width: 100%;
-//     height: 100%;
-//     display: flex;
-//     flex-direction: column;
+  .no-projects {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
-//     gap: 20px;
-//     text-align: center;
-//   }
-//   .sec-txt {
-//     font-size: 20px;
-//     color: #7f7f7f;
-//     font-weight: 300;
-//     margin-top: -10px;
-//   }
-//   .add-project-btn {
-//     display: flex;
-//     align-items: center;
-//     gap: 10px;
-//     padding: 12px;
-//     background: rgba(
-//       0,
-//       0,
-//       0,
-//       0.025
-//     ); // subtle light glass effect for dark background
-//     backdrop-filter: blur(2px);
-//     -webkit-backdrop-filter: blur(2px);
-//     border-radius: 12px;
-//     border: 1px solid rgba(255, 255, 255, 0.1);
-//     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.141),
-//       inset 0 1px 0 rgba(255, 255, 255, 0.038),
-//       inset 0 -1px 0 rgba(255, 255, 255, 0.03),
-//       inset 0 0 20px 5px rgba(255, 255, 255, 0.028);
-//     transition: all 0.3s ease-in-out;
-//     cursor: pointer;
-//   }
-//   .add-project-btn:hover {
-//     transform: scale(0.96);
-//     transition: all 0.3s ease-in-out;
-//   }
-//   .add-icon {
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     padding: 14px;
-//     background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
-//     border-radius: 10px;
-//   }
-//   .btn-txt {
-//     font-size: 20px;
-//     color: var(--btn-txt);
-//   }
-//   .workflow-cards {
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     grid-area: 20px;
-//   }
-// }
+    gap: 20px;
+    text-align: center;
+  }
+  .sec-txt {
+    font-size: 20px;
+    color: #7f7f7f;
+    font-weight: 300;
+    margin-top: -10px;
+  }
+  .add-project-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(
+      0,
+      0,
+      0,
+      0.025
+    ); // subtle light glass effect for dark background
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.141),
+      inset 0 1px 0 rgba(255, 255, 255, 0.038),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 0 20px 5px rgba(255, 255, 255, 0.028);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .add-project-btn:hover {
+    transform: scale(0.96);
+    transition: all 0.3s ease-in-out;
+  }
+  .add-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    border-radius: 10px;
+  }
+  .btn-txt {
+    font-size: 20px;
+    color: var(--btn-txt);
+  }
+  .workflow-cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-area: 20px;
+  }
+}
 
-// // ... your existing SCSS styles ...
+// ... your existing SCSS styles ...
 
-// /* --- Popup Styles --- */
-// .popup-overlay {
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   background: rgba(10, 10, 10, 0.6);
-//   backdrop-filter: blur(8px);
-//   -webkit-backdrop-filter: blur(8px);
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   z-index: 1000;
-//   animation: fadeIn 0.3s ease-out;
-// }
+/* --- Popup Styles --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
 
-// .popup-content {
-//   background: #1e1e1e; // A slightly lighter shade than pure black
-//   padding: 30px 35px;
-//   border-radius: 16px;
-//   border: 1px solid rgba(255, 255, 255, 0.1);
-//   width: 90%;
-//   max-width: 480px;
-//   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-//   display: flex;
-//   flex-direction: column;
-//   gap: 12px;
-//   animation: slideUp 0.4s ease-out;
+.popup-content {
+  background: #1e1e1e; // A slightly lighter shade than pure black
+  padding: 30px 35px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out;
 
-//   h2 {
-//     color: var(--primary-txt);
-//     font-size: 20px;
-//     margin: 0;
-//     font-weight: 500;
-//   }
+  h2 {
+    color: var(--primary-txt);
+    font-size: 20px;
+    margin: 0;
+    font-weight: 500;
+  }
 
-//   p {
-//     color: #8a8a8a;
-//     font-size: 15px;
-//     margin: 0 0 10px 0;
-//   }
+  p {
+    color: #8a8a8a;
+    font-size: 15px;
+    margin: 0 0 10px 0;
+  }
 
-//   input {
-//     width: 100%;
-//     padding: 14px;
-//     background: rgba(0, 0, 0, 0.2);
-//     border: 1px solid rgba(255, 255, 255, 0.15);
-//     border-radius: 10px;
-//     color: var(--primary-txt);
-//     font-size: 16px;
-//     transition: border-color 0.2s ease;
+  input {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: var(--primary-txt);
+    font-size: 16px;
+    transition: border-color 0.2s ease;
 
-//     &:focus {
-//       outline: none;
-//       border-color: #ff5930;
-//     }
-//   }
-// }
+    &:focus {
+      outline: none;
+      border-color: #ff5930;
+    }
+  }
+}
 
-// .popup-actions {
-//   display: flex;
-//   justify-content: flex-end;
-//   gap: 12px;
-//   margin-top: 20px;
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
 
-//   button {
-//     padding: 8px 16px;
-//     border: none;
-//     border-radius: 8px;
-//     font-size: 16px;
-//     font-weight: 500;
-//     cursor: pointer;
-//     transition: all 0.2s ease;
-//   }
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-//   .btn-cancel {
-//     background: transparent;
-//     border: 1px solid #555;
-//     color: #999;
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid #555;
+    color: #999;
 
-//     &:hover {
-//       background: rgba(255, 255, 255, 0.05);
-//       color: #ccc;
-//     }
-//   }
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ccc;
+    }
+  }
 
-//   .btn-create {
-//     background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
-//     color: white;
+  .btn-create {
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    color: white;
 
-//     &:hover {
-//       transform: translateY(-2px);
-//       box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
-//     }
-//   }
-// }
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
+    }
+  }
+}
 
-// .popup-error {
-//   color: #ff7070;
-//   font-size: 14px;
-//   margin-top: 5px;
-// }
+.popup-error {
+  color: #ff7070;
+  font-size: 14px;
+  margin-top: 5px;
+}
 
-// /* --- Keyframe Animations for Popup --- */
-// @keyframes fadeIn {
-//   from {
-//     opacity: 0;
-//   }
-//   to {
-//     opacity: 1;
-//   }
-// }
+/* --- Keyframe Animations for Popup --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
-// @keyframes slideUp {
-//   from {
-//     opacity: 0;
-//     transform: translateY(20px);
-//   }
-//   to {
-//     opacity: 1;
-//     transform: translateY(0);
-//   }
-// }
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-// /* Add these new styles to your existing workspace.scss file */
+/* Add these new styles to your existing workspace.scss file */
 
-// .workflow-cards {
-//   display: grid;
-//   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-//   gap: 25px;
-//   width: 100%;
-//   padding: 20px 0;
-// }
+.workflow-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  width: 100%;
+  padding: 20px 0;
+}
 
-// .workflow-card {
-//   background: rgba(30, 30, 30, 0.5);
-//   backdrop-filter: blur(5px);
-//   -webkit-backdrop-filter: blur(5px);
-//   border-radius: 16px;
-//   border: 1px solid rgba(255, 255, 255, 0.1);
-//   padding: 20px;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: space-between;
-//   transition: all 0.3s ease-in-out;
-//   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+.workflow-card {
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 
-//   &:hover {
-//     transform: translateY(-5px);
-//     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-//     border-color: rgba(255, 89, 48, 0.5);
-//   }
-// }
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 89, 48, 0.5);
+  }
+}
 
-// .card-content {
-//   .card-title {
-//     font-size: 18px;
-//     font-weight: 500;
-//     color: var(--primary-txt);
-//     margin: 0 0 8px 0;
-//   }
+.card-content {
+  .card-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--primary-txt);
+    margin: 0 0 8px 0;
+  }
 
-//   .card-author {
-//     font-size: 14px;
-//     color: #a0a0a0;
-//     margin: 0;
-//   }
-// }
+  .card-author {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin: 0;
+  }
+}
 
-// .card-actions {
-//   display: flex;
-//   gap: 10px;
-//   margin-top: 20px;
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
 
-//   button {
-//     flex-grow: 1;
-//     padding: 10px 12px;
-//     border: none;
-//     border-radius: 8px;
-//     font-size: 15px;
-//     font-weight: 500;
-//     cursor: pointer;
-//     transition: all 0.2s ease;
-//   }
+  button {
+    flex-grow: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
 
-//   .btn-view {
-//     background: transparent;
-//     border: 1px solid #555;
-//     color: #ccc;
+  .btn-view {
+    background: transparent;
+    border: 1px solid #555;
+    color: #ccc;
 
-//     &:hover {
-//       background: rgba(255, 255, 255, 0.1);
-//       color: white;
-//     }
-//   }
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+  }
 
-//   .btn-buy {
-//     background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
-//     color: white;
+  .btn-buy {
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    color: white;
 
-//     &:hover {
-//       transform: scale(1.05);
-//       box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
-//     }
-//   }
-// }
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
+    }
+  }
+}
 
-// /* Ensure the add project button fits well in the grid */
-// .add-project-btn {
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   gap: 15px;
-//   padding: 20px;
-//   min-height: 180px; /* Give it a similar height to the cards */
-// }
+/* Ensure the add project button fits well in the grid */
+.add-project-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  min-height: 180px; /* Give it a similar height to the cards */
+}
 
-// .add-icon {
-//   padding: 20px;
-// }
+.add-icon {
+  padding: 20px;
+}
 
-// .btn-txt {
-//   font-size: 18px;
-// }
+.btn-txt {
+  font-size: 18px;
+}

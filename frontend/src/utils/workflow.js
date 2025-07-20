@@ -67,3 +67,18 @@ export async function getExecutionStatus(executionId) {
     );
   }
 }
+
+export async function getAllWorkflow() {
+  try {
+    // A GET request to a 'status' endpoint for a specific execution ID.
+    const response = await axios.get(`${baseUrl}/wflow/all/list`, {
+      withCredentials: true,
+    });
+    return response.data; // Expected to return { status: "...", message: "..." }
+  } catch (error) {
+    console.error(
+      "Failed to get execution status:",
+      error.response?.data || error.message
+    );
+  }
+}

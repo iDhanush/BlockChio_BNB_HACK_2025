@@ -1,15 +1,18 @@
 "use client";
-import { useState } from "react"; // Import useState
+import { useEffect, useState } from "react"; // Import useState
 import { useRouter } from "next/navigation";
 import "./workspace.scss";
 import axios from "axios";
 import { baseUrl } from "@/constants";
+import { getAllWorkflow } from "@/utils/workflow";
+import Link from "next/link";
 
 const Page = () => {
   const router = useRouter();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [workflowName, setWorkflowName] = useState("");
   const [error, setError] = useState("");
+  const [workflows, setWorkflows] = useState(null);
 
   // This function now just opens the popup
   const handleNewProjectClick = () => {
@@ -53,6 +56,17 @@ const Page = () => {
     setIsPopupOpen(false);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getAllWorkflow();
+      if (res) {
+        setWorkflows(res?.wflow_list);
+      }
+    };
+    fetchData();
+  }, []);
+  console.log(workflows);
+
   return (
     <>
       <div className="workspace-sec">
@@ -62,27 +76,42 @@ const Page = () => {
             Start building powerful AI workflows by
             <br /> adding your first project.
           </div>
-          <div className="workflow-cards">
-            <div className="add-project-btn" onClick={handleNewProjectClick}>
-              <div className="add-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={27}
-                  height={26}
-                  fill="none"
-                >
-                  <path
-                    stroke="#F3F4F5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={3}
-                    d="M13.5 1.5v23M2 13h23"
-                  />
-                </svg>
-              </div>
-              <div className="btn-txt">New Project</div>
+          <div className="add-project-btn" onClick={handleNewProjectClick}>
+            <div className="add-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width={27}
+                height={26}
+                fill="none"
+              >
+                <path
+                  stroke="#F3F4F5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M13.5 1.5v23M2 13h23"
+                />
+              </svg>
             </div>
+            <div className="btn-txt">New Project</div>
           </div>
+          {workflows?.length > 0 && (
+            <div className="workflow-cards">
+              <div className="cards-head">Recent Workflows</div>
+              {workflows?.map(
+                (item) =>
+                  item?.wflow_name != null && (
+                    <Link
+                      key={item?.wflow_id}
+                      href={`/workspace/${item?.wflow_id}`}
+                      className="workflow-card"
+                    >
+                      {item?.wflow_name}
+                    </Link>
+                  )
+              )}
+            </div>
+          )}
         </div>
       </div>
 
