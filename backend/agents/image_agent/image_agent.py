@@ -7,6 +7,7 @@ from langgraph.graph import StateGraph, END
 from agents.blockchain_agent.schemas import AgentState
 from agents.image_agent.schemas import ImagePrompt
 from agents.llm import get_llm
+from responses import StandardException
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 
@@ -65,8 +66,8 @@ class ImageAgent:
             result = await agent_executor.ainvoke({
                 "input": question, })
             state["response"] = result.get("output", "Error: Could not get output from agent")
-            # if type(state["response"]) is not dict:
-            # state["response"] = "Error: Could not get output from agent"
+            if type(state["response"]) is not dict:
+                raise StandardException(status_code=402, details='invalid')
             return state
 
         # Define the graph

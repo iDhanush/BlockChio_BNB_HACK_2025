@@ -34,6 +34,17 @@ class WFlow(BaseModel):
     connections: list[Conn]
 
 
+class WFlowPayload(BaseModel):
+    wflow_name: Optional[str] = None
+    nodes: list[Node]
+    connections: list[Conn]
+
+
+class WorkFlowStatus(BaseModel):
+    node_id: str
+    status: str
+    show: str
+
 #
 sample_workflow = WFlow(
     wflow_name='str',
@@ -88,13 +99,6 @@ sample_workflow = WFlow(
     ]
 )
 print(sample_workflow.model_dump())
-
-
-class WFlowPayload(BaseModel):
-    wflow_name: Optional[str] = None
-    nodes: list[Node]
-    connections: list[Conn]
-
 
 data = {
     "nodes": [

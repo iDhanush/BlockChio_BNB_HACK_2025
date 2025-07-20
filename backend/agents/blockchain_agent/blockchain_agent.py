@@ -17,11 +17,11 @@ web3 = Web3(Web3.HTTPProvider("https://bsc-testnet.infura.io/v3/eab9f2aff8984a57
 
 
 class BlockchainAgent:
-    def __init__(self, cred: dict):
+    def __init__(self, creds: dict):
         self.llm = get_llm()
         self.tools = []
-        self.wallet = cred.get("wallet")
-        self.private_key = cred.get("private_key")
+        self.wallet = creds.get("wallet")
+        self.private_key = creds.get("private_key")
         self.agent = self.get_agent()
         self.struct_tools = self.StructTools(self)
 

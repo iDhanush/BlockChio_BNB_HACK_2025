@@ -18,3 +18,4 @@ class Var:
     R_SECRET_KEY = os.environ.get('R_SECRET_KEY')
     GOOGLE_API_KEYS: list = [k.strip() for k in os.environ.get('GOOGLE_API_KEYS', '').split(' ')]
     TEST_MODE = (int(os.environ.get('TEST_MODE', 0)) == 1)
+    WORKFLOW_STATUS = {}
