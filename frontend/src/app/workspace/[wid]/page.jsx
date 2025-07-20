@@ -159,7 +159,7 @@ const nodeTemplates = [
     icon: Send,
     color: "blue",
     node_class: "TelegramAgent",
-    creds: [{ bot_token: null }],
+    creds: [{ bot_token: "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs" }],
     tools: [
       {
         label: "Send Message",

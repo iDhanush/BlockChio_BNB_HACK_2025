@@ -3,8 +3,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import "./marketplace.scss";
 import axios from "axios";
+import TopNav from "@/components/TopNav/TopNav";
+import Image from "next/image";
 // Assuming baseUrl is defined in your constants file
 // import { baseUrl } from "@/constants";
+
+import TMP from "../../../public/assets/temp.png";
+import Link from "next/link";
 
 // Mock baseUrl for demonstration purposes
 const baseUrl = "https://api.example.com";
@@ -21,7 +26,6 @@ const Page = () => {
     { id: 1, name: "Customer Support Bot", author: "AI Solutions" },
     { id: 2, name: "Data Analysis Pipeline", author: "Data Corp" },
     { id: 3, name: "Social Media Manager", author: "Connect Inc." },
-    { id: 4, name: "E-commerce Automation", author: "Shopify Experts" },
   ];
 
   useEffect(() => {
@@ -80,11 +84,31 @@ const Page = () => {
 
   return (
     <>
+      <TopNav />
       <div className="market-sec">
-        <div className="sec-head">Your Workflows</div>
-        <div className="sec-txt">
-          Explore your existing AI workflows or start a new one.
+        <div className="top-sec">
+          <div className="left-sec">
+            <div className="sec-head">
+              Build Smarter with Decentralized AI Agent Templates
+            </div>
+            <div className="sec-txt">
+              Explore reusable agents, forkable flows, and launch-ready AI
+              setups.
+            </div>
+            <div className="hero-btns">
+              <Link href="/marketplace" className="view-btn">
+                View Templates
+              </Link>
+              <Link href="/workspace" className="workflow-btn">
+                Build Now
+              </Link>
+            </div>
+          </div>
+          <div className="right-sec">
+            <Image className="right-sec-img" src={TMP} alt="img" />
+          </div>
         </div>
+
         <div className="workflow-cards">
           {/* Workflow Cards */}
           {workflows.map((flow) => (
@@ -101,31 +125,6 @@ const Page = () => {
           ))}
         </div>
       </div>
-
-      {isPopupOpen && (
-        <div className="popup-overlay" onClick={handleClosePopup}>
-          <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Create New Workflow</h2>
-            <p>Enter a name for your new workflow project.</p>
-            <input
-              type="text"
-              placeholder="e.g., Customer Support Bot"
-              value={workflowName}
-              onChange={(e) => setWorkflowName(e.target.value)}
-              autoFocus
-            />
-            {error && <div className="popup-error">{error}</div>}
-            <div className="popup-actions">
-              <button onClick={handleClosePopup} className="btn-cancel">
-                Cancel
-              </button>
-              <button onClick={handleCreateProject} className="btn-create">
-                Create Project
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
