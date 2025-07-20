@@ -333,7 +333,6 @@ const NodePopup = ({ node, onClose, onSave }) => {
               <label htmlFor="purpose">Purpose</label>
               <input
                 id="purpose"
-                rows="3"
                 value={settings.purpose || ""}
                 placeholder="Describe the purpose or role of this node..."
                 onChange={handlePurposeChange}
@@ -750,7 +749,12 @@ export default function N8nWorkflowBuilder() {
     setNodes((prevNodes) =>
       prevNodes.map((n) =>
         n.id === updatedNode.id
-          ? { ...n, creds: updatedNode.creds, tools: updatedNode.tools }
+          ? {
+              ...n,
+              creds: updatedNode.creds,
+              tools: updatedNode.tools,
+              purpose: updatedNode.purpose,
+            }
           : n
       )
     );
