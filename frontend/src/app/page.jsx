@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import DASH from "../../public/assets/dashimg.png";
 import Image from "next/image";
+import Link from "next/link";
 
 // Register the ScrollTrigger plugin with GSAP
 gsap.registerPlugin(ScrollTrigger);
@@ -57,8 +58,12 @@ const Page = () => {
               <br /> adding your first project.
             </div>
             <div className="hero-btns">
-              <div className="view-btn">View Templates</div>
-              <div className="workflow-btn">Build Now</div>
+              <Link href="/marketplace" className="view-btn">
+                View Templates
+              </Link>
+              <Link href="/workspace" className="workflow-btn">
+                Build Now
+              </Link>
             </div>
           </div>
         </div>

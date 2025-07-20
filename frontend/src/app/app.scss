@@ -94,6 +94,11 @@
     border: 1px solid var(--brand);
     border-radius: 10px;
     color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  .view-btn:hover {
+    transform: scale(0.96);
+    transition: all 0.3s ease-in-out;
   }
   .workflow-btn {
     display: flex;
@@ -104,6 +109,11 @@
     border-radius: 10px;
     background-color: var(--brand);
     color: #fff;
+    transition: all 0.3s ease-in-out;
+  }
+  .workflow-btn:hover {
+    transform: scale(0.96);
+    transition: all 0.3s ease-in-out;
   }
   /* From Uiverse.io by adamgiebl */
   .workflow-btn {
