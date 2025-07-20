@@ -7,14 +7,17 @@ from globar_vars import Var
 from wflow.schemas import WFlow, WFlowPayload, sample_workflow
 from utils.tokenizer import invoke_uid
 from fastapi import Depends
+
 from wflow.wflow import WorkflowExecutor
 
 wflow_router = APIRouter(prefix='/wflow')
 
+
 @wflow_router.get('/all/list')
-async def list_workflows(user:User= Depends(get_user)):
+async def list_workflows(user: User = Depends(get_user)):
     wflow_list = await Var.db.get_wflows(user.user_id)
     return {'wflow_list': wflow_list}
+
 
 @wflow_router.post('/')
 async def create_wflow(wflow_payload: WFlowPayload, user: User = Depends(get_user), ):
@@ -46,3 +49,9 @@ async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload, _user: User 
     executor = WorkflowExecutor(workflow=wflow_data)
     await executor.execute("create a cute cat")
 
+
+@wflow_router.get('/{wflow_id}/status')
+async def get_wflow_status(wflow_id: str):
+    status = Var.WORKFLOW_STATUS.get(wflow_id)
+
+    return {'status': status}

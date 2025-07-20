@@ -75,7 +75,6 @@ class ImageAgent:
                 if resp.status != 200:
                     return f"Request failed with status code {resp.status}"
                 response_json = await resp.json()
-                print(str(response_json)[:600])
                 # Traverse to find the base64-encoded image. This depends on actual API response structure.
                 image_base64  = response_json["candidates"][0]["content"]["parts"][1]["inlineData"]["data"]
                 if not image_base64:
@@ -86,7 +85,7 @@ class ImageAgent:
                     f.write(base64.b64decode(image_base64))
                 return (
                     f"I have created an image for the prompt: {prompt}\n"
-                    f"url: file://{img_filename}\n"
+                    f"url: https://{img_filename}\n"
                     " note that the final output should contain all this information including the comment and url"
                 )
 
