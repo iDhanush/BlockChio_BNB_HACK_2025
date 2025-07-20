@@ -141,7 +141,7 @@ def mint_nft(image_url: str) -> str:
 
 # --- Running the Async Initialization ---
 
-async def main():
+async def start_blockchain_funcs():
     """Main async function to setup and run the application logic."""
     # Your existing setup logic
     account = get_account()
@@ -163,7 +163,7 @@ FundMe = p.FundMe
 SimpleCollectible = p.SimpleCollectible
 account = get_account()
 # # Run the main async function
-asyncio.run(main())
+# asyncio.run(main())
 #
 # account = get_account()
 #     network_name = network.show_active()

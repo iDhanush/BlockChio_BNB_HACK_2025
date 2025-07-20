@@ -1,4 +1,7 @@
 import traceback
+
+from agents.blockchain_agent.blockchain import start_blockchain_funcs
+from agents.telegram_agent.telegram_trigger import start_telegram_trigger
 from globar_vars import Var
 from database import DataBase
 from fastapi import FastAPI, Request
@@ -13,6 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 @asynccontextmanager
 async def lifespan(_fastapi: FastAPI):
     Var.db = DataBase()
+    await start_telegram_trigger()
+    await start_blockchain_funcs()
     yield
 
 
