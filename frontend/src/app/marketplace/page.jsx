@@ -80,33 +80,12 @@ const Page = () => {
 
   return (
     <>
-      <div className="workspace-sec">
+      <div className="market-sec">
         <div className="sec-head">Your Workflows</div>
         <div className="sec-txt">
           Explore your existing AI workflows or start a new one.
         </div>
         <div className="workflow-cards">
-          {/* Add Project Button Card */}
-          <div className="add-project-btn" onClick={handleNewProjectClick}>
-            <div className="add-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={27}
-                height={26}
-                fill="none"
-              >
-                <path
-                  stroke="#F3F4F5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M13.5 1.5v23M2 13h23"
-                />
-              </svg>
-            </div>
-            <div className="btn-txt">New Project</div>
-          </div>
-
           {/* Workflow Cards */}
           {workflows.map((flow) => (
             <div key={flow.id} className="workflow-card">

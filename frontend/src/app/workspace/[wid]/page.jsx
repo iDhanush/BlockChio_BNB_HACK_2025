@@ -670,50 +670,53 @@ export default function N8nWorkflowBuilder() {
   }, [nodes, connections, workflowId]);
 
   const handleExecute = useCallback(async () => {
-    if (isExecuting) return;
-    setIsExecuting(true);
-    setExecutionStatus({ type: "info", message: "Initiating execution..." });
-    if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+    // if (isExecuting) return;
+    // setIsExecuting(true);
+    // setExecutionStatus({ type: "info", message: "Initiating execution..." });
+    // if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
 
     try {
       const workflowData = { nodes, connections };
       const response = await executeWflow(workflowId, workflowData);
-      if (!response?.executionId)
+      if (response) {
+        // setExecutionStatus({
+        //   type: "info",
+        //   message: "Execution started. Polling for status...",
+        // });
+        alert("executed");
+      } else {
         throw new Error("Did not receive an execution ID.");
-      setExecutionStatus({
-        type: "info",
-        message: "Execution started. Polling for status...",
-      });
+      }
 
-      pollingIntervalRef.current = setInterval(async () => {
-        try {
-          const result = await getExecutionStatus(response.executionId);
-          if (!result) return;
-          const finalStates = ["COMPLETED", "SUCCESS", "FAILED", "ERROR"];
-          if (finalStates.includes(result.status.toUpperCase())) {
-            clearInterval(pollingIntervalRef.current);
-            setIsExecuting(false);
-            setExecutionStatus({
-              type: result.status.toUpperCase().includes("FAIL")
-                ? "error"
-                : "success",
-              message: result.message,
-            });
-          } else {
-            setExecutionStatus({
-              type: "info",
-              message: `Status: ${result.message}`,
-            });
-          }
-        } catch (pollError) {
-          clearInterval(pollingIntervalRef.current);
-          setIsExecuting(false);
-          setExecutionStatus({
-            type: "error",
-            message: "Error while polling status.",
-          });
-        }
-      }, 4000);
+      // pollingIntervalRef.current = setInterval(async () => {
+      //   try {
+      //     const result = await getExecutionStatus(response.executionId);
+      //     if (!result) return;
+      //     const finalStates = ["COMPLETED", "SUCCESS", "FAILED", "ERROR"];
+      //     if (finalStates.includes(result.status.toUpperCase())) {
+      //       clearInterval(pollingIntervalRef.current);
+      //       setIsExecuting(false);
+      //       setExecutionStatus({
+      //         type: result.status.toUpperCase().includes("FAIL")
+      //           ? "error"
+      //           : "success",
+      //         message: result.message,
+      //       });
+      //     } else {
+      //       setExecutionStatus({
+      //         type: "info",
+      //         message: `Status: ${result.message}`,
+      //       });
+      //     }
+      //   } catch (pollError) {
+      //     clearInterval(pollingIntervalRef.current);
+      //     setIsExecuting(false);
+      //     setExecutionStatus({
+      //       type: "error",
+      //       message: "Error while polling status.",
+      //     });
+      //   }
+      // }, 4000);
     } catch (error) {
       setIsExecuting(false);
       setExecutionStatus({

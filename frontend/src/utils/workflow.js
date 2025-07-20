@@ -41,7 +41,7 @@ export async function executeWflow(wflowId, workflowData) {
       }
     );
     console.log("Execution started:", response.data);
-    return response.data; // Expected to return { executionId: "..." }
+    return response;
   } catch (error) {
     console.error(
       "Failed to start execution:",
