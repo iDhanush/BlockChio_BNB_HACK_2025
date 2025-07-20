@@ -1,0 +1,238 @@
+// Main container for the chat widget
+.chat-widget {
+  width: 370px;
+  height: 500px;
+  max-height: 700px;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background-color: var(--primary-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+// Header section
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--sec-bg);
+  border-bottom: 1px solid var(--border);
+
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .bot-icon {
+    color: var(--brand);
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    .title {
+      font-weight: 400;
+      color: #fff;
+    }
+    .status {
+      font-size: 0.75rem;
+      color: #475569;
+    }
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    &:hover {
+      background-color: #ffffff0e;
+    }
+  }
+}
+
+// Main chat body where messages appear
+.chat-body {
+  flex-grow: 1;
+  padding: 1rem 0.5rem;
+  overflow-y: auto;
+  background-color: transparent;
+
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+// Container for a single message (bubble + metadata)
+.message-container {
+  display: flex;
+  margin-bottom: 0.75rem;
+  padding: 0 0.5rem;
+
+  // User's messages align to the right
+  &.user {
+    justify-content: flex-end;
+    .message-bubble {
+      background-color: var(--brand);
+      color: #ffffff;
+      border-radius: 1rem 1rem 0.25rem 1rem;
+    }
+  }
+
+  // Bot's messages align to the left
+  &.bot {
+    justify-content: flex-start;
+    .message-bubble {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      border-radius: 1rem 1rem 1rem 0.25rem;
+      border: 1px solid var(--border);
+    }
+  }
+}
+
+// The message bubble itself
+.message-bubble {
+  max-width: 80%;
+  padding: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+
+  p {
+    margin: 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  .timestamp {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    align-self: flex-end;
+    margin-top: 0.25rem;
+  }
+
+  &.user .timestamp {
+    color: #dbeafe;
+  }
+
+  &.image {
+    padding: 0.25rem;
+    .message-image {
+      max-width: 100%;
+      border-radius: 0.75rem;
+      display: block;
+    }
+    .timestamp {
+      padding-right: 0.5rem;
+      padding-bottom: 0.25rem;
+    }
+  }
+}
+
+// Footer section with input field
+.chat-footer {
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border);
+
+  .image-preview-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+
+    .image-preview {
+      max-height: 80px;
+      border-radius: 0.5rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .remove-image-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #334155;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .input-area {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 9999px;
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    border: 1px solid var(--border);
+
+    input[type="text"] {
+      flex-grow: 1;
+      border: none;
+      outline: none;
+      background: none;
+      color: #e7e7e7;
+      font-size: 0.9rem;
+      &::placeholder {
+        color: #bababa;
+      }
+    }
+
+    .icon-button,
+    .send-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 0.5rem;
+      transition: background-color 0.2s;
+    }
+
+    .icon-button {
+      background: none;
+      color: #64748b;
+      &:hover {
+        background-color: #ffffff0f;
+      }
+    }
+
+    .send-button {
+      background-color: var(--brand);
+      color: #ffffff;
+      &:hover {
+        filter: brightness(.8);
+      }
+    }
+  }
+}
