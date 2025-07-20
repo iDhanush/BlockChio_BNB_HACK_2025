@@ -11,7 +11,7 @@ from wflow.wflow import WorkflowExecutor
 
 wflow_router = APIRouter(prefix='/wflow')
 
-@wflow_router.get('/wflows/list')
+@wflow_router.get('/all/list')
 async def list_workflows(user:User= Depends(get_user)):
     wflow_list = await Var.db.get_wflows(user.user_id)
     return {'wflow_list': wflow_list}
