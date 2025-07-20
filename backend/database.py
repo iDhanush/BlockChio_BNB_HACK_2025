@@ -30,8 +30,8 @@ class DataBase:
 
         return wflow_data
 
-    async def get_wflows(self, wflow_id: str):
-        wflow_data = await self.wflows.find({'wflow_id': wflow_id}, {'_id': 0} ).to_list(None)
+    async def get_wflows(self):
+        wflow_data = await self.wflows.find({}, {'_id': 0} ).to_list(None)
         return wflow_data
 
     async def set_wflow(self, wflow_id: str, wflow: WFlowPayload):
