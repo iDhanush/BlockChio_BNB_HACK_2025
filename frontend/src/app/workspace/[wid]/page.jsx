@@ -279,6 +279,14 @@ const ExecutionStatusToast = ({ status, onClose }) => {
 const NodePopup = ({ node, onClose, onSave }) => {
   const [settings, setSettings] = useState(JSON.parse(JSON.stringify(node)));
 
+  // Handler for the new purpose input
+  const handlePurposeChange = (e) => {
+    setSettings((prev) => ({
+      ...prev,
+      purpose: e.target.value,
+    }));
+  };
+
   const handleCredentialChange = (key, value) => {
     setSettings((prev) => ({
       ...prev,
@@ -319,7 +327,19 @@ const NodePopup = ({ node, onClose, onSave }) => {
             <X size={20} />
           </button>
         </div>
-        <div className="popup-content">
+        <div className="node-popup-content">
+          <div className="popup-section">
+            <div className="form-group">
+              <label htmlFor="purpose">Purpose</label>
+              <input
+                id="purpose"
+                rows="3"
+                value={settings.purpose || ""}
+                placeholder="Describe the purpose or role of this node..."
+                onChange={handlePurposeChange}
+              />
+            </div>
+          </div>
           {settings.creds &&
             settings.creds.length > 0 &&
             Object.keys(settings.creds[0]).length > 0 && (
