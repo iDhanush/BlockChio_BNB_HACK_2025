@@ -1,7 +1,6 @@
 import base64
-import time
-from pathlib import Path
 
+import aiohttp
 from langchain.agents import create_structured_chat_agent
 from langchain.agents.agent import AgentExecutor
 from langsmith import Client
@@ -10,48 +9,11 @@ from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
 from agents.blockchain_agent.schemas import AgentState
 from agents.image_agent.schemas import ImagePrompt
-from agents.llm import get_llm
+from agents.llm import get_llm, get_api_key
 from responses import StandardException
-import requests
+from utils.tokenizer import invoke_uid
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
-
-
-import base64
-import json
-import requests
-from pathlib import Path
-def generate_gemini_image(api_key: str, prompt: str, output_file: str = "gemini_image.png"):
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent"
-    headers = {
-        "x-goog-api-key": api_key,  # <-- Must be a string!
-        "Content-Type": "application/json"
-    }
-    data = {
-        "contents": [{
-            "parts": [
-                {"text": prompt}
-            ]
-        }],
-        "generationConfig": {
-            "responseModalities": ["TEXT", "IMAGE"]
-        }
-    }
-
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code != 200:
-        raise Exception(f"Request failed: {response.status_code}, {response.text}")
-
-    try:
-        base64_data = response.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
-        print(base64_data)
-        with open(output_file, "wb") as f:
-            f.write(base64.b64decode(base64_data))
-        print(f"Image saved to {output_file}")
-    except Exception as e:
-        raise Exception(f"Failed to decode image: {e}")
-# Example usage:
-generate_gemini_image(get_llm(), "A cyberpunk astronaut dog on Mars playing chess with a robot.")
 
 
 class ImageAgent:
@@ -95,16 +57,38 @@ class ImageAgent:
         return "yoyoyo"
 
     @staticmethod
-    async def generate_image(prompt: str):
-        await asyncio.sleep(1)
-        response = client.models.generate_content(
-            model="gemini-2.0-flash-preview-image-generation",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                response_modalities=['TEXT', 'IMAGE']
-            )
-        )
-        return f"I have created an image for the prompt: {prompt}\nurl: https://jjssr.com/image.jpg\n note that the final output should contain all this information including the comment and url"
+    async def generate_image(prompt: str) -> str:
+        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent"
+        headers = {
+            "x-goog-api-key": get_api_key(),
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }],
+            "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+        }
+
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, headers=headers, json=payload) as resp:
+                if resp.status != 200:
+                    return f"Request failed with status code {resp.status}"
+                response_json = await resp.json()
+                print(str(response_json)[:600])
+                # Traverse to find the base64-encoded image. This depends on actual API response structure.
+                image_base64  = response_json["candidates"][0]["content"]["parts"][1]["inlineData"]["data"]
+                if not image_base64:
+                    return "Image data not found in the response"
+                # Decode and save the image
+                img_filename = f"images/{invoke_uid(prefix='img')}.png"
+                with open(img_filename, "wb") as f:
+                    f.write(base64.b64decode(image_base64))
+                return (
+                    f"I have created an image for the prompt: {prompt}\n"
+                    f"url: file://{img_filename}\n"
+                    " note that the final output should contain all this information including the comment and url"
+                )
 
     @staticmethod
     def create_workflow(agent_executor):
@@ -157,19 +141,22 @@ class ImageAgent:
 
 
 import asyncio
-generate_and_save_image('a cute cat')
-# async def main():
-#     agent = ImageAgent()
-#     agent.tools.append(agent.struct_tools.create_img)
+
+
+async def main():
+    agent = ImageAgent()
+    agent.tools.append(agent.struct_tools.generate_image)
+
+    # Sample query to test the agent with tool usage
+    query = "Create an image of a cat"
+    print(await agent.generate_image(query))
+    print(f"User: {query}")
+    # response = await agent.run(query)
+    #
+    # print(f"Agent Response:\n{response}")
+
+
 #
-#     # Sample query to test the agent with tool usage
-#     query = "Create an image of a cat"
 #
-#     print(f"User: {query}")
-#     response = await agent.run(query)
-#
-#     print(f"Agent Response:\n{response}")
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
