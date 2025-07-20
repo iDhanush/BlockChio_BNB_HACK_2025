@@ -12,5 +12,9 @@ for api_key in Var.GOOGLE_API_KEYS:
     llm_list.append(llm)
 
 
+def get_api_key():
+    return random.choice(Var.GOOGLE_API_KEYS)
+
+
 def get_llm():
     return random.choice(llm_list)
