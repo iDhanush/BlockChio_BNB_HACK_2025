@@ -1,3 +1,7 @@
+import base64
+import time
+from pathlib import Path
+
 from langchain.agents import create_structured_chat_agent
 from langchain.agents.agent import AgentExecutor
 from langsmith import Client
@@ -8,8 +12,46 @@ from agents.blockchain_agent.schemas import AgentState
 from agents.image_agent.schemas import ImagePrompt
 from agents.llm import get_llm
 from responses import StandardException
+import requests
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
+
+
+import base64
+import json
+import requests
+from pathlib import Path
+def generate_gemini_image(api_key: str, prompt: str, output_file: str = "gemini_image.png"):
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent"
+    headers = {
+        "x-goog-api-key": api_key,  # <-- Must be a string!
+        "Content-Type": "application/json"
+    }
+    data = {
+        "contents": [{
+            "parts": [
+                {"text": prompt}
+            ]
+        }],
+        "generationConfig": {
+            "responseModalities": ["TEXT", "IMAGE"]
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code != 200:
+        raise Exception(f"Request failed: {response.status_code}, {response.text}")
+
+    try:
+        base64_data = response.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
+        print(base64_data)
+        with open(output_file, "wb") as f:
+            f.write(base64.b64decode(base64_data))
+        print(f"Image saved to {output_file}")
+    except Exception as e:
+        raise Exception(f"Failed to decode image: {e}")
+# Example usage:
+generate_gemini_image(get_llm(), "A cyberpunk astronaut dog on Mars playing chess with a robot.")
 
 
 class ImageAgent:
@@ -55,6 +97,13 @@ class ImageAgent:
     @staticmethod
     async def generate_image(prompt: str):
         await asyncio.sleep(1)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-preview-image-generation",
+            contents=contents,
+            config=types.GenerateContentConfig(
+                response_modalities=['TEXT', 'IMAGE']
+            )
+        )
         return f"I have created an image for the prompt: {prompt}\nurl: https://jjssr.com/image.jpg\n note that the final output should contain all this information including the comment and url"
 
     @staticmethod
@@ -108,6 +157,7 @@ class ImageAgent:
 
 
 import asyncio
+generate_and_save_image('a cute cat')
 # async def main():
 #     agent = ImageAgent()
 #     agent.tools.append(agent.struct_tools.create_img)

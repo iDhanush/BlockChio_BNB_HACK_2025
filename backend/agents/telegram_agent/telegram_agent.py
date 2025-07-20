@@ -1,4 +1,5 @@
 import asyncio
+from aiogram import Bot
 from agents.llm import get_llm
 from langchain.agents.agent import AgentExecutor
 from langchain.agents import create_structured_chat_agent
@@ -8,32 +9,66 @@ from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
 from agents.telegram_agent.schemas import TelegramImageInput, TelegramTextInput, AgentState
 
-prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
+# Pull the prompt template from LangSmith Hub
+# You can replace this with your own prompt if you prefer
+try:
+    prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
+except Exception as e:
+    print(f"Could not pull prompt from LangSmith. Using a default. Error: {e}")
+    from langchain_core.prompts import ChatPromptTemplate
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "You are a helpful assistant."),
+            ("human", "{input}"),
+            ("placeholder", "{agent_scratchpad}"),
+        ]
+    )
 
 
 class TelegramAgent:
-    def __init__(self):
+    def __init__(self, creds: dict):
+        """
+        Initializes the agent, tools, and the aiogram Bot instance.
+
+        Args:
+            creds (dict): A dictionary containing credentials.
+                          Expected key: 'bot_token'.
+        """
+        if "bot_token" not in creds:
+            raise ValueError("`creds` dictionary must contain a 'bot_token' key.")
+
+        # Initialize Aiogram Bot
+        self.bot = Bot(token=creds["bot_token"])
+
         self.llm = get_llm()
-        self.tools = []
         self.struct_tools = self.StructTools(self)
+
+        # Add tools to the agent's tool list
+        self.tools = [
+            self.struct_tools.send_message,
+            self.struct_tools.send_image,
+        ]
+
         self.agent = self.get_agent()
 
     class StructTools:
-        def __init__(self, other_self):
+        def __init__(self, agent_instance):
             self.send_message = StructuredTool.from_function(
-                name="send_message",
-                coroutine=other_self.send_message,
-                description="""send message through telegram_agent""",
+                name="send_telegram_message",
+                coroutine=agent_instance.send_message,
+                description="Sends a text message to a specified user through Telegram.",
                 args_schema=TelegramTextInput
             )
             self.send_image = StructuredTool.from_function(
-                name="send_image",
-                coroutine=other_self.send_image,
-                description="""Send image through telegram_agent""",
+                name="send_telegram_image",
+                coroutine=agent_instance.send_image,
+                description="Sends an image from a URL to a specified user through Telegram.",
                 args_schema=TelegramImageInput
             )
 
     def get_agent(self):
+        """Creates the LangChain agent and wraps it in a LangGraph workflow."""
         agent = create_structured_chat_agent(
             llm=self.llm,
             tools=self.tools,
@@ -47,89 +82,77 @@ class TelegramAgent:
             handle_parsing_errors=True
         )
 
-        # Create LangGraph workflow
-        workflow = self.create_workflow(agent_executor)
-        self.agent = workflow
-        return workflow
+        return self.create_workflow(agent_executor)
 
-    @staticmethod
-    async def google_search(search_list: list[str]):
-        print(type(search_list), search_list)
-        return "yoyoyo"
+    async def send_message(self, user_id: int, text: str) -> str:
+        """
+        Sends a text message to a user via Telegram using aiogram.
+        """
+        try:
+            await self.bot.send_message(chat_id=user_id, text=text)
+            print(f"Message sent to user {user_id}")
+            return f"Successfully sent message to user_id {user_id}."
+        except Exception as e:
+            error_message = f"Failed to send message to user_id {user_id}. Error: {e}"
+            print(error_message)
+            return error_message
 
-    @staticmethod
-    async def send_message(user_id: int, text: str):
-        await asyncio.sleep(1)
-        return (f"I send the message: '{text}' "
-                f"to userid: {user_id}")
-
-    @staticmethod
-    async def send_image(user_id: int, image_url: str):
-        await asyncio.sleep(1)
-        return f"I have snd image"
+    async def send_image(self, user_id: int, image_url: str) -> str:
+        """
+        Sends an image to a user via Telegram using aiogram.
+        """
+        try:
+            await self.bot.send_photo(chat_id=user_id, photo=image_url)
+            print(f"Image sent to user {user_id}")
+            return f"Successfully sent image to user_id {user_id}."
+        except Exception as e:
+            error_message = f"Failed to send image to user_id {user_id}. Error: {e}"
+            print(error_message)
+            return error_message
 
     @staticmethod
     def create_workflow(agent_executor):
-        # Define the nodes for our graph
+        """Defines and compiles the LangGraph workflow."""
+
         @chain
         async def agent_node(state: AgentState) -> AgentState:
-            question = state["question"]
             result = await agent_executor.ainvoke({
-                "input": question, })
+                "input": state["question"],
+                "chat_history": state.get("chat_history", [])
+            })
             state["response"] = result.get("output", "Error: Could not get output from agent")
-            # if type(state["response"]) is not dict:
-            # state["response"] = "Error: Could not get output from agent"
             return state
 
-        # Define the graph
         workflow = StateGraph(AgentState)
-
-        # Add the agent node
         workflow.add_node("agent", agent_node)
-
-        # Set the entry point
         workflow.set_entry_point("agent")
-
-        # Set the exit point
         workflow.add_edge("agent", END)
-
-        # Compile the graph
         return workflow.compile()
 
-    # noinspection PyTypeChecker
     async def run(self, query: str):
+        """
+        Runs the agent with a given query, with a retry mechanism.
+        """
         result = None
-        query = "Create an image from prompt" + query
+        last_exception = None
         for i in range(3):
             try:
-                self.agent = self.get_agent()
+                # No need to re-create the agent here, it's done in __init__
                 result = await self.agent.ainvoke({
                     "question": query,
-                    "response": None
                 })
                 break
             except Exception as e:
-                print('exception happened in agent 1:', str(e))
+                print(f'Exception happened in agent (attempt {i + 1}/3): {e}')
                 last_exception = e
-                continue
+                await asyncio.sleep(1)  # Wait before retrying
+
         if not result:
-            return "Error: Could not get output from agent"
+            return f"Error: Could not get output from agent after 3 attempts. Last error: {last_exception}"
 
         return result
 
-# import asyncio
-# async def main():
-#     agent = TelegramAgent()
-#     agent.tools.append(agent.struct_tools.send_message)
-#
-#     # Sample query to test the agent with tool usage
-#     query = "Send message hello"
-#
-#     print(f"User: {query}")
-#     response = await agent.run(query)
-#
-#     print(f"Agent Response:\n{response}")
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
+
+async def main():
+    agent = TelegramAgent(creds={'bot_token': bot_token})
+    await agent.bot.session.close()
