@@ -702,7 +702,11 @@ export default function N8nWorkflowBuilder() {
         //   type: "info",
         //   message: "Execution started. Polling for status...",
         // });
-        alert("executed");
+        setExecutionStatus({
+          type: "success",
+          message: "Workflow saved successfully!",
+        });
+        // alert("executed");
       } else {
         throw new Error("Did not receive an execution ID.");
       }
@@ -775,6 +779,13 @@ export default function N8nWorkflowBuilder() {
             <h1 className="title">Project Builder</h1>
             <div className="actions">
               <button
+                onClick={saveWorkflow}
+                className="btn btn-save"
+                disabled={isExecuting}
+              >
+                <Save size={16} /> Save
+              </button>
+              <button
                 onClick={handleExecute}
                 className="btn btn-execute"
                 disabled={isExecuting}
@@ -789,13 +800,6 @@ export default function N8nWorkflowBuilder() {
                     <Play size={16} /> Execute
                   </>
                 )}
-              </button>
-              <button
-                onClick={saveWorkflow}
-                className="btn btn-save"
-                disabled={isExecuting}
-              >
-                <Save size={16} /> Save
               </button>
             </div>
           </div>

@@ -101,8 +101,17 @@ const NavContent = memo(() => {
       <Link href="/" className="top-nav-left">
         BlockChio
       </Link>
-      <div className="top-nav-center">hi</div>
+
       <div className="top-nav-right">
+        <div className="top-nav-center">
+          {" "}
+          <Link href="/marketplace" className="nav-link">
+            Templates
+          </Link>
+          <Link href="/workspace" className="nav-link">
+            Workspace
+          </Link>
+        </div>
         <WalletLogger />
       </div>
     </div>
@@ -123,8 +132,16 @@ const TopNav = () => {
         <Link href="/" className="top-nav-left">
           BlockChio
         </Link>
-        <div className="top-nav-center">hi</div>
+
         <div className="top-nav-right">
+          <div className="top-nav-center">
+            <Link href="/marketplace" className="nav-link">
+              Templates
+            </Link>
+            <Link href="/workspace" className="nav-link">
+              Workspace
+            </Link>
+          </div>
           <div style={{ width: "120px", height: "40px" }}>
             {/* Placeholder for connect button */}
           </div>

@@ -18,14 +18,22 @@
     display: flex;
     align-items: center;
     color: var(--primary-txt);
-    font-size: 17px;
+    font-size: 15px;
     flex: 1;
     width: 100%;
     justify-content: center;
     text-decoration: none;
-    display: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 300;
   }
 
+  .top-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
   .top-nav-right button {
     width: fit-content;
     height: 45px;
