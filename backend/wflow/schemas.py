@@ -45,6 +45,7 @@ class WorkFlowStatus(BaseModel):
     status: str
     show: str
 
+
 #
 sample_workflow = WFlow(
     wflow_name='str',
@@ -79,7 +80,9 @@ sample_workflow = WFlow(
             tools=[Tool(tool_func="send_message", label="asdasd",
                         description="dedsa", active=True), Tool(tool_func="send_image", label="asdasd",
                                                                 description="dedsa", active=True)],
-            creds=[],
+            creds=[{
+                "bot_token": "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"
+            }],
         ),
         Node(
             node_id="whatsapp_agent_1",
@@ -98,8 +101,43 @@ sample_workflow = WFlow(
         Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
     ]
 )
-print(sample_workflow.model_dump())
 
+# print(sample_workflow.model_dump())
+sample_workflow2 = WFlow(
+    wflow_name='str',
+    user_id='asdads',
+    wflow_id='wfl_OLASjlajnfJ',
+    nodes=[
+        Node(
+            node_id="whatsapp_trigger_1",
+            purpose="",
+            type="trigger",
+            node_class="WhatsappTrigger",
+            position={"x": 100, "y": 100},
+            tools=[],
+            creds=[],
+        ),
+        Node(
+            node_id="telegram_agent_1",
+            type="agent",
+            node_class="TelegramAgent",
+            purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
+            position={"x": 500, "y": 100},
+            tools=[Tool(tool_func="send_message", label="asdasd",
+                        description="dedsa", active=True), Tool(tool_func="send_image", label="asdasd",
+                                                                description="dedsa", active=True)],
+            creds=[{
+                "bot_token": "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"
+            }],
+        ),
+
+    ],
+    connections=[
+        Conn(conn_id='telegram_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
+        Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
+        Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
+    ]
+)
 data = {
     "nodes": [
         {
@@ -150,7 +188,7 @@ data = {
             "node_class": "TelegramAgent",
             "creds": [
                 {
-                    "bot_token": None
+                    "bot_token": "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"
                 }
             ],
             "tools": [
@@ -188,4 +226,65 @@ data = {
         }
     ]
 }
-conn = Node(**data.get('nodes')[1])
+wpay = WFlowPayload(**{
+    'wflow_name': 'name',
+    "nodes": [
+        {
+            "node_id": "manual_trigger",
+            "type": "trigger",
+            "label": "Manual Trigger",
+            "icon": {},
+            "color": "gray",
+            "node_class": "ManualTrigger",
+            "creds": [],
+            "tools": [],
+            "purpose": "send a message to 868213406",
+            "id": "manual_trigger_1",
+            "position": {
+                "x": 105.586669921875,
+                "y": 134.2755584716797
+            }
+        },
+        {
+            "node_id": "telegram_agent",
+            "type": "agent",
+            "label": "Telegram Agent",
+            "icon": {},
+            "color": "blue",
+            "node_class": "TelegramAgent",
+            "creds": [
+                {
+                    "bot_token": "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"
+                }
+            ],
+            "tools": [
+                {
+                    "label": "Send Message",
+                    "description": "Send a transaction",
+                    "tool_func": "send_message",
+                    "active": True
+                },
+                {
+                    "label": "Send Image",
+                    "description": "Send a transaction",
+                    "tool_func": "send_image",
+                    "active": True
+                }
+            ],
+            "purpose": "send hi to 868213405",
+            "id": "telegram_agent_1",
+            "position": {
+                "x": 394.0909118652344,
+                "y": 222.54969787597656
+            }
+        }
+    ],
+    "connections": [
+        {
+            "conn_id": "manual_trigger_1_to_telegram_agent_1_1752997287620",
+            "from_node": "manual_trigger_1",
+            "to_node": "telegram_agent_1"
+        }
+    ]
+})
+k = WFlow(**wpay.model_dump(), user_id='asdas', wflow_id='asdasd')

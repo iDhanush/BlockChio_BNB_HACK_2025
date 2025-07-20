@@ -8,9 +8,10 @@ from langchain_core.tools import StructuredTool
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
 from agents.telegram_agent.schemas import TelegramImageInput, TelegramTextInput, AgentState
-
+from agents.telegram_agent import telegram_trigger
 # Pull the prompt template from LangSmith Hub
 # You can replace this with your own prompt if you prefer
+
 try:
     prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 except Exception as e:
@@ -25,9 +26,8 @@ except Exception as e:
         ]
     )
 
-
 class TelegramAgent:
-    def __init__(self, creds: dict):
+    def __init__(self, creds: list):
         """
         Initializes the agent, tools, and the aiogram Bot instance.
 
@@ -35,12 +35,16 @@ class TelegramAgent:
             creds (dict): A dictionary containing credentials.
                           Expected key: 'bot_token'.
         """
+        creds2 = {}
+        for cred in creds:
+            for key, val in cred.items():
+                creds2[key] = val
+        creds = creds2
         if "bot_token" not in creds:
             raise ValueError("`creds` dictionary must contain a 'bot_token' key.")
 
         # Initialize Aiogram Bot
         self.bot = Bot(token=creds["bot_token"])
-
         self.llm = get_llm()
         self.struct_tools = self.StructTools(self)
 
@@ -154,5 +158,5 @@ class TelegramAgent:
 
 
 async def main():
-    agent = TelegramAgent(creds={'bot_token': bot_token})
+    agent = TelegramAgent(creds=[{'bot_token': 'bot_token'}])
     await agent.bot.session.close()

@@ -17,7 +17,7 @@ prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=T
 
 
 class ImageAgent:
-    def __init__(self):
+    def __init__(self, creds):
         self.llm = get_llm()
         self.tools = []
         self.struct_tools = self.StructTools(self)
@@ -98,8 +98,8 @@ class ImageAgent:
             result = await agent_executor.ainvoke({
                 "input": question, })
             state["response"] = result.get("output", "Error: Could not get output from agent")
-            if type(state["response"]) is not dict:
-                raise StandardException(status_code=402, details='invalid')
+            # if type(state["response"]) is not dict:
+            #     raise StandardException(status_code=402, details='invalid')
             return state
 
         # Define the graph

@@ -12,7 +12,7 @@ prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=T
 
 
 class WhatsappAgent:
-    def __init__(self):
+    def __init__(self, creds):
         self.llm = get_llm()
         self.tools = []
         self.struct_tools = self.StructTools(self)
@@ -64,7 +64,7 @@ class WhatsappAgent:
                 f"to number: {number}")
 
     @staticmethod
-    async def send_image(user_id: int, image_url: str):
+    async def send_image(number: int, image_url: str):
         await asyncio.sleep(1)
         return f"I have snd image"
 
