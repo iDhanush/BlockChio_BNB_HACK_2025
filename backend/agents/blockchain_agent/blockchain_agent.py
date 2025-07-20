@@ -4,7 +4,7 @@ from langsmith import Client
 from langchain_core.tools import StructuredTool
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
-from agents.blockchain_agent.blockchian import get_balance, payment, mint_nft
+from agents.blockchain_agent.blockchain import get_balance, payment, mint_nft
 from langchain_google_genai import ChatGoogleGenerativeAI
 from web3 import Web3
 from pydantic import BaseModel
@@ -143,7 +143,7 @@ async def main():
     agent.tools.append(agent.struct_tools.transfer)
     agent.tools.append(agent.struct_tools.mint_nft)
     # Sample query to test the agent with tool usage
-    query = "whats my balance"
+    query = "make an nft with url https://cdn.britannica.com/29/150929-050-547070A1/lion-Kenya-Masai-Mara-National-Reserve.jpg"
 
     print(f"User: {query}")
     response = await agent.run(query)

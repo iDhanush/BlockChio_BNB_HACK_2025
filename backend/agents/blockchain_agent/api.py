@@ -1,7 +1,7 @@
 from auth.schemas import User
 from auth.auth import get_user
 from fastapi import APIRouter, Depends
-from agents.blockchain_agent.blockchian import get_balance, payment, mint_nft
+from agents.blockchain_agent.blockchain import get_balance, payment, mint_nft
 
 blockchain_router = APIRouter(prefix='/v1/test', tags=["test"])
 

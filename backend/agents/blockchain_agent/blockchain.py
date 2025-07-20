@@ -157,13 +157,13 @@ async def main():
     # print(balance)
 
 #
-# p = project.load('agents/blockchain_agent/brown')
-# network.connect('bsc-testnet')
-# FundMe = p.FundMe
-# SimpleCollectible = p.SimpleCollectible
-# account = get_account()
+p = project.load('agents/blockchain_agent/brown')
+network.connect('bsc-testnet')
+FundMe = p.FundMe
+SimpleCollectible = p.SimpleCollectible
+account = get_account()
 # # Run the main async function
-# # asyncio.run(main())
+asyncio.run(main())
 #
 # account = get_account()
 #     network_name = network.show_active()
