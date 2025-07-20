@@ -11,6 +11,10 @@ from wflow.wflow import WorkflowExecutor
 
 wflow_router = APIRouter(prefix='/wflow')
 
+@wflow_router.get('/wflows')
+async def list_workflows(user:User= Depends(get_user)):
+    wflow_list = await Var.db.get_wflows(user.user_id)
+    return {'wflow_list': wflow_list}
 
 @wflow_router.post('/')
 async def create_wflow(wflow_payload: WFlowPayload, user: User = Depends(get_user), ):
@@ -42,7 +46,3 @@ async def execute_wflow(wflow_id: str, wflow_payload: WFlowPayload, _user: User 
     executor = WorkflowExecutor(workflow=wflow_data)
     await executor.execute("create a cute cat")
 
-@wflow_router.get('/wflows')
-async def list_workflows(user:User= Depends(get_user)):
-    wflow_list = await Var.db.get_wflows()
-    return {'wflow_list': wflow_list}
