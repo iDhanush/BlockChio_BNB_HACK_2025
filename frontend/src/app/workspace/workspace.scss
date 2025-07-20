@@ -1,0 +1,264 @@
+.work-space-wrap {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--primary-bg);
+}
+.workspace-body {
+  width: 100%;
+  height: 100%;
+  --dot-bg: var(--primary-bg);
+  --dot-color: rgba(165, 165, 165, 0.196);
+  --dot-size: 2px;
+  --dot-space: 24px;
+  background: linear-gradient(
+        90deg,
+        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+        transparent 1%
+      )
+      center / var(--dot-space) var(--dot-space),
+    linear-gradient(
+        var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+        transparent 1%
+      )
+      center / var(--dot-space) var(--dot-space),
+    var(--dot-color);
+}
+
+.workspace-sec {
+  width: 100%;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  grid-area: 20px;
+
+  .sec-head {
+    font-family: var(--myFont);
+    font-size: 50px;
+    color: var(--primary-txt);
+    font-weight: 300;
+  }
+
+  .no-projects {
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+  .sec-txt {
+    font-size: 20px;
+    color: #7f7f7f;
+    font-weight: 300;
+    margin-top: -10px;
+  }
+  .add-project-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(
+      0,
+      0,
+      0,
+      0.025
+    ); // subtle light glass effect for dark background
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.141),
+      inset 0 1px 0 rgba(255, 255, 255, 0.038),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 0 20px 5px rgba(255, 255, 255, 0.028);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .add-project-btn:hover {
+    transform: scale(0.96);
+    transition: all 0.3s ease-in-out;
+  }
+  .add-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    border-radius: 10px;
+  }
+  .btn-txt {
+    font-size: 20px;
+    color: var(--btn-txt);
+  }
+  .workflow-cards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    max-width: 500px;
+  }
+  .cards-head{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #c8c8c8;
+  }
+  .workflow-card {
+    padding: 20px 60px;
+    height: 80px;
+    background: rgba(30, 30, 30, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(.96);
+    }
+  }
+}
+
+// ... your existing SCSS styles ...
+
+/* --- Popup Styles --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.popup-content {
+  background: #1e1e1e; // A slightly lighter shade than pure black
+  padding: 30px 35px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideUp 0.4s ease-out;
+
+  h2 {
+    color: var(--primary-txt);
+    font-size: 20px;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  p {
+    color: #8a8a8a;
+    font-size: 15px;
+    margin: 0 0 10px 0;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: var(--primary-txt);
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #ff5930;
+    }
+  }
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid #555;
+    color: #999;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ccc;
+    }
+  }
+
+  .btn-create {
+    background: radial-gradient(100% 100% at 100% 0%, #ff8c70 0%, #ff5930 100%);
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 89, 48, 0.3);
+    }
+  }
+}
+
+.popup-error {
+  color: #ff7070;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* --- Keyframe Animations for Popup --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
