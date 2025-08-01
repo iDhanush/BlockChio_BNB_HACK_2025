@@ -3,12 +3,14 @@ from server import app
 from auth.api import auth_router
 from user.api import user_router
 from wflow.api import wflow_router
-
+from fastapi.staticfiles import StaticFiles
 app.include_router(wflow_router)
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(blockchain_router)
 
+# Serve static files under /images
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 @app.get("/test")
 async def root():

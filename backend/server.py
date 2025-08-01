@@ -1,7 +1,6 @@
 import traceback
-
 from agents.blockchain_agent.blockchain import start_blockchain_funcs
-from agents.telegram_agent.telegram_trigger import start_telegram_trigger
+from triggers.telegram_trigger import start_telegram_trigger
 from globar_vars import Var
 from database import DataBase
 from fastapi import FastAPI, Request

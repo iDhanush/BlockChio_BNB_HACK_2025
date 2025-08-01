@@ -1,3 +1,5 @@
+import os
+
 from langchain.agents import create_structured_chat_agent
 from langchain.agents.agent import AgentExecutor
 from langsmith import Client
@@ -20,8 +22,13 @@ class BlockchainAgent:
     def __init__(self, creds: dict):
         self.llm = get_llm()
         self.tools = []
-        self.wallet = creds.get("wallet")
-        self.private_key = creds.get("private_key")
+        creds2 = {}
+        for cred in creds:
+            for key, val in cred.items():
+                creds2[key] = val
+        creds = creds2
+        self.wallet = creds.get("wallet") or os.environ.get('WALLET')
+        self.private_key = creds.get("private_key") or os.environ.get('PRIVATE_KEY')
         self.agent = self.get_agent()
         self.struct_tools = self.StructTools(self)
 

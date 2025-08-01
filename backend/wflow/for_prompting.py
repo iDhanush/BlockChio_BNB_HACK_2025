@@ -3,6 +3,11 @@ from venv import create
 
 from pydantic import BaseModel, constr
 
+from agents.blockchain_agent.blockchain_agent import BlockchainAgent
+from agents.image_agent.image_agent import ImageAgent
+from agents.telegram_agent.telegram_agent import TelegramAgent
+from agents.whatsapp_agent.whatsapp_agent import WhatsappAgent
+
 
 class Tool(BaseModel):
     tool_func: str
@@ -73,11 +78,11 @@ sample_workflow = WFlow(
             node_id="telegram_agent_1",
             type="agent",
             node_class="TelegramAgent",
-            purpose="if the prompt given by the user is about avengers then send it to user 868213406 else do nothing",
+            purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
             position={"x": 500, "y": 100},
             tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
                    Tool(tool_func='send_image', label='send_image', active=True, description='')],
-            creds=[{'bot_token': "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"}],
+            creds=[],
 
         ),
         Node(
@@ -90,13 +95,66 @@ sample_workflow = WFlow(
                    Tool(tool_func='send_image', label='send_image', active=True, description='')], creds=[],
         )
     ],
-    connections=[
-        Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
-        Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
-        Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
-        ], wflow_name='name'
+    connections=[Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
+           Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
+           Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
+           ]
 )
-telegram_blockchain_workflow = WFlow(
+AGENT_CLASS_MAP = {
+    "ImageAgent": ImageAgent,
+    "WhatsappAgent": WhatsappAgent,
+    "TelegramAgent": TelegramAgent,
+    'BlockchainAgent': BlockchainAgent
+}
+
+
+# sample function for running workflowsa
+async def workflow_runner(runnable_workflow: RunnableWorkflow, trigger: str, query):
+    # run the workflow according to the trigger
+    # agent = get the starting node which is after the trigger
+    query: str = query + node.purpose  # add the purpose to the query
+    res = await agent.run(query)
+    query = res + purpose  # add the purpose to the response of the agent then pass it to next agent
+    res = await next_agent.run(query)
+
+    query = res + purpose  # add the purpose to the response of the agent then pass it to next agent
+    res = await next_agent.run(query)
+    # repeat until the end is reached
+    # then return the final res
+    return res
+
+
+async def on_execute(wflow: WFlow):
+    # agents = find all nodes with node.type=agent
+    agents: list[Node]
+    for agent in agents:
+        agent_class_name = agent.node_class
+        agent_class = AGENT_CLASS_MAP.get(agent_class_name)
+        agent_obj = agent_class(creds=agent.creds)
+        for tool in agent.tools:
+            # tool will be a string and i want to get it using struct_tools.{tool}
+            agent_obj.tools = agent_obj.struct_tools.str(tool.tool_func)
+    # triggers = find all triggers with node.type=trigger
+    # eg: WhatsAppTrigger, TelegramTrigger, WebChatTrigger
+    triggers: list[Node]
+    for trigger in triggers:
+        trigger_class_name = trigger.node_class
+    # then use the new initialised nodes to create a new RunnableWorkFlow with necessary data
+    # then set the trigger for the runnable work flow appropriatly
+    # there may be multiple workflows so do plan accordingly
+    for trigger in triggers:
+        trigger_class_name = trigger.node_class
+        set_trigger(workflow=runnable_workflow, trigger=trigger)
+
+
+async def on_example_trigger(workflow_id, query):
+    # runnable_workflow =  get workflow from id
+    # run the workflow based on the trigger
+    res = workflow_runner(runnable_workflow, trigger, query)
+    return await respond_trigger(res)
+
+
+sample_workflow = WFlow(
     user_id='usr_xxxxxxxxxxx',
     wflow_id='wfl_OLASjlajnfJ',
     nodes=[
@@ -110,143 +168,40 @@ telegram_blockchain_workflow = WFlow(
             creds=[],
         ),
         Node(
-            node_id="blockchain_agent_1",
+            node_id="image_agent_1",
             type="agent",
-            node_class="BlockchainAgent",
-            purpose="DO as said by the user",
+            node_class="ImageAgent",
+            purpose="Generate Image for the prompt given",
             position={"x": 300, "y": 100},
-            tools=[Tool(tool_func='get_balance', label='get_balance', active=True, description='')],
+            tools=[Tool(tool_func='generate_image', label='generate_image', active=True, description='')],
             creds=[],
         ),
         Node(
             node_id="telegram_agent_1",
             type="agent",
             node_class="TelegramAgent",
-            purpose="send the info to user 868213406",
+            purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
             position={"x": 500, "y": 100},
             tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
                    Tool(tool_func='send_image', label='send_image', active=True, description='')],
-            creds=[{'bot_token': "1765542474:AAHpERwNgs7o9_qkxmkaDqwOhN5T9efmSSs"}],
+            creds=[],
 
         ),
-        # Node(
-        #     node_id="whatsapp_agent_1",
-        #     type="agent",
-        #     node_class="WhatsappAgent",
-        #     purpose="if the image generated is of a dog then send it to the number 9995539972 else do nothing",
-        #     position={"x": 500, "y": 100},
-        #     tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
-        #            Tool(tool_func='send_image', label='send_image', active=True, description='')], creds=[],
-        # )
+        Node(
+            node_id="whatsapp_agent_1",
+            type="agent",
+            node_class="WhatsappAgent",
+            purpose="if the image generated is of a dog then send it to the number 9995539972 else do nothing",
+            position={"x": 500, "y": 100},
+            tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
+                   Tool(tool_func='send_image', label='send_image', active=True, description='')], creds=[],
+        )
     ],
-    connections=[
-        Conn(conn_id='whatsapp_trigger_1_to_blockchain_agent_1', from_node="whatsapp_trigger_1", to_node="blockchain_agent_1"),
-        Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="blockchain_agent_1", to_node="telegram_agent_1"),
-        # Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
-        ], wflow_name='name'
+    connections=[Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
+           Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
+           Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
+           ]
 )
-# AGENT_CLASS_MAP = {
-#     "ImageAgent": ImageAgent,
-#     "WhatsappAgent": WhatsappAgent,
-#     "TelegramAgent": TelegramAgent,
-#     'BlockchainAgent': BlockchainAgent
-# }
-#
-#
-# # sample function for running workflowsa
-# async def workflow_runner(runnable_workflow: RunnableWorkflow, trigger: str, query):
-#     # run the workflow according to the trigger
-#     # agent = get the starting node which is after the trigger
-#     query: str = query + node.purpose  # add the purpose to the query
-#     res = await agent.run(query)
-#     query = res + purpose  # add the purpose to the response of the agent then pass it to next agent
-#     res = await next_agent.run(query)
-#
-#     query = res + purpose  # add the purpose to the response of the agent then pass it to next agent
-#     res = await next_agent.run(query)
-#     # repeat until the end is reached
-#     # then return the final res
-#     return res
-#
-#
-# async def on_execute(wflow: WFlow):
-#     # agents = find all nodes with node.type=agent
-#     agents: list[Node]
-#     for agent in agents:
-#         agent_class_name = agent.node_class
-#         agent_class = AGENT_CLASS_MAP.get(agent_class_name)
-#         agent_obj = agent_class(creds=agent.creds)
-#         for tool in agent.tools:
-#             # tool will be a string and i want to get it using struct_tools.{tool}
-#             agent_obj.tools = agent_obj.struct_tools.str(tool.tool_func)
-#     # triggers = find all triggers with node.type=trigger
-#     # eg: WhatsAppTrigger, TelegramTrigger, WebChatTrigger
-#     triggers: list[Node]
-#     for trigger in triggers:
-#         trigger_class_name = trigger.node_class
-#     # then use the new initialised nodes to create a new RunnableWorkFlow with necessary data
-#     # then set the trigger for the runnable work flow appropriatly
-#     # there may be multiple workflows so do plan accordingly
-#     for trigger in triggers:
-#         trigger_class_name = trigger.node_class
-#         set_trigger(workflow=runnable_workflow, trigger=trigger)
-#
-#
-# async def on_example_trigger(workflow_id, query):
-#     # runnable_workflow =  get workflow from id
-#     # run the workflow based on the trigger
-#     res = workflow_runner(runnable_workflow, trigger, query)
-#     return await respond_trigger(res)
-#
-#
-# sample_workflow = WFlow(
-#     user_id='usr_xxxxxxxxxxx',
-#     wflow_id='wfl_OLASjlajnfJ',
-#     nodes=[
-#         Node(
-#             node_id="whatsapp_trigger_1",
-#             purpose="",
-#             type="trigger",
-#             node_class="WhatsappTrigger",
-#             position={"x": 100, "y": 100},
-#             tools=[],
-#             creds=[],
-#         ),
-#         Node(
-#             node_id="image_agent_1",
-#             type="agent",
-#             node_class="ImageAgent",
-#             purpose="Generate Image for the prompt given",
-#             position={"x": 300, "y": 100},
-#             tools=[Tool(tool_func='generate_image', label='generate_image', active=True, description='')],
-#             creds=[],
-#         ),
-#         Node(
-#             node_id="telegram_agent_1",
-#             type="agent",
-#             node_class="TelegramAgent",
-#             purpose="if the image generated is of a cat then send it to user 868213406 else do nothing",
-#             position={"x": 500, "y": 100},
-#             tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
-#                    Tool(tool_func='send_image', label='send_image', active=True, description='')],
-#             creds=[],
-#
-#         ),
-#         Node(
-#             node_id="whatsapp_agent_1",
-#             type="agent",
-#             node_class="WhatsappAgent",
-#             purpose="if the image generated is of a dog then send it to the number 9995539972 else do nothing",
-#             position={"x": 500, "y": 100},
-#             tools=[Tool(tool_func='send_message', label='send_message', active=True, description=''),
-#                    Tool(tool_func='send_image', label='send_image', active=True, description='')], creds=[],
-#         )
-#     ],
-#     connections=[Conn(conn_id='whatsapp_trigger_1_to_image_agent_1', from_node="whatsapp_trigger_1", to_node="image_agent_1"),
-#            Conn(conn_id='image_agent_1_to_telegram_agent_1', from_node="image_agent_1", to_node="telegram_agent_1"),
-#            Conn(conn_id='image_agent_1_to_whatsapp_agent_1', from_node="image_agent_1", to_node="whatsapp_agent_1"),
-#            ]
-# )
 
 # print(sample_workflow.model_dump())
 sample_workflow2 = WFlow(
@@ -393,7 +348,7 @@ wpay = WFlowPayload(**{
             }
         },
         {
-            "node_id": "telegram_agent",
+            "node_id": "telegram_agent_1",
             "type": "agent",
             "label": "Telegram Agent",
             "icon": {},

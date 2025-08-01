@@ -8,7 +8,7 @@ from langchain_core.tools import StructuredTool
 from langchain_core.runnables import chain
 from langgraph.graph import StateGraph, END
 from agents.telegram_agent.schemas import TelegramImageInput, TelegramTextInput, AgentState
-from agents.telegram_agent import telegram_trigger
+
 # Pull the prompt template from LangSmith Hub
 # You can replace this with your own prompt if you prefer
 

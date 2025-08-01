@@ -10,6 +10,7 @@ from langgraph.graph import StateGraph, END
 from agents.blockchain_agent.schemas import AgentState
 from agents.image_agent.schemas import ImagePrompt
 from agents.llm import get_llm, get_api_key
+from globar_vars import Var
 from responses import StandardException
 from utils.tokenizer import invoke_uid
 
@@ -85,8 +86,8 @@ class ImageAgent:
                     f.write(base64.b64decode(image_base64))
                 return (
                     f"I have created an image for the prompt: {prompt}\n"
-                    f"url: https://{img_filename}\n"
-                    " note that the final output should contain all this information including the comment and url"
+                    f"url: {Var.BASE_URL}/{img_filename}\n"
+                    "note that the final output should contain all this information including the comment and url"
                 )
 
     @staticmethod
