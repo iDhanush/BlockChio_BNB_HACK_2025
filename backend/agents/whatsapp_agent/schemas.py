@@ -11,10 +11,11 @@ class AgentState(TypedDict):
 
 
 class WhatsappTextInput(BaseModel):
-    number: int = Field(..., description="The Whatsapp number of recipient")
+    number: str = Field(..., description="The Whatsapp number of recipient")
     text: str = Field(..., description="The text for sending message in Whatsapp")
 
 
 class WhatsappImageInput(BaseModel):
-    number: int = Field(..., description="The Whatsapp number of recipient")
+    number: str = Field(..., description="The Whatsapp number of recipient")
     image_url: str = Field(..., description="The URL for sending image in Whatsapp")
+    body : str = Field(..., description="The text for sending image in Whatsapp")

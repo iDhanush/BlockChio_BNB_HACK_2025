@@ -22,5 +22,6 @@ langsmith
 langchain-community
 langchain-google-community
 starlette
+twilio
 
 

@@ -1,4 +1,6 @@
 import asyncio
+from http.client import responses
+
 from langsmith import Client
 from agents.llm import get_llm
 from langchain_core.runnables import chain
@@ -7,14 +9,24 @@ from langchain_core.tools import StructuredTool
 from langchain.agents.agent import AgentExecutor
 from langchain.agents import create_structured_chat_agent
 from agents.whatsapp_agent.schemas import WhatsappTextInput, WhatsappImageInput, AgentState
+from agents.whatsapp_agent.whatsapp import snd_image, snd_message
+from twilio.rest import Client as Whatsapp
+
+from globar_vars import Var
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 
 
 class WhatsappAgent:
-    def __init__(self, creds):
+    def __init__(self, creds:list):
         self.llm = get_llm()
         self.tools = []
+        creds2 = {}
+        for cred in creds:
+            for key, val in cred.items():
+                creds2[key] = val
+        self.creds = creds2
+        self.creds["whatsapp_client"] = Whatsapp(self.creds.get('account_sid'), self.creds.get('auth_token'))
         self.struct_tools = self.StructTools(self)
         self.agent = self.get_agent()
 
@@ -57,16 +69,13 @@ class WhatsappAgent:
         print(type(search_list), search_list)
         return "yoyoyo"
 
-    @staticmethod
-    async def send_message(number: int, text: str):
-        await asyncio.sleep(1)
-        return (f"I send the message: '{text}' "
-                f"to number: {number}")
+    async def send_message(self, number: str, text: str):
+        response = await snd_message(self.creds, number, text)
+        return response
 
-    @staticmethod
-    async def send_image(number: int, image_url: str):
-        await asyncio.sleep(1)
-        return f"I have snd image"
+    async def send_image(self, number: str, image_url: str, body:str):
+        response = await snd_image(self.creds, number, image_url, body)
+        return response
 
     @staticmethod
     def create_workflow(agent_executor):
@@ -99,7 +108,6 @@ class WhatsappAgent:
     # noinspection PyTypeChecker
     async def run(self, query: str):
         result = None
-        query = "Create an image from prompt" + query
         for i in range(3):
             try:
                 self.agent = self.get_agent()
@@ -117,19 +125,23 @@ class WhatsappAgent:
 
         return result
 
-# import asyncio
-# async def main():
-#     agent = WhatsappAgent()
-#     agent.tools.append(agent.struct_tools.send_message)
-#
-#     # Sample query to test the agent with tool usage
-#     query = "Send message hello"
-#
-#     print(f"User: {query}")
-#     response = await agent.run(query)
-#
-#     print(f"Agent Response:\n{response}")
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())
+import asyncio
+async def main():
+    account_sid = Var.ACCOUNT_SID
+    auth_token = Var.AUTH_TOKEN
+    whatsapp_number = Var.WHATSAPP_NUMBER
+    cred = [{"account_sid":account_sid, "auth_token":auth_token, "whatsapp_number":whatsapp_number}]
+    agent = WhatsappAgent(cred)
+    agent.tools.append(agent.struct_tools.send_message)
+    agent.tools.append(agent.struct_tools.send_image)
+    # Sample query to test the agent with tool usage
+    query = "Send image https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtzQxCr9uIe4TS2m6Hg5IvNqQATg-wpo3KdQ&s +918891636432"
+
+    print(f"User: {query}")
+    response = await agent.run(query)
+
+    print(f"Agent Response:\n{response}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
