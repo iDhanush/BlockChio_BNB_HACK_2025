@@ -1,1 +1,1 @@
-export const baseUrl = "https://bnb.zdisk.xyz";
+export const baseUrl = "https://bnb.floks.dev";

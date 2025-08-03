@@ -269,9 +269,9 @@ const ExecutionStatusToast = ({ status, onClose }) => {
     <div className={`status-toast ${status.type}`}>
       <div className="status-icon">{getIcon()}</div>
       <p className="status-message">{status.message}</p>
-      <button className="close-toast" onClick={onClose}>
+      {/* <button className="close-toast" onClick={onClose}>
         <X size={16} />
-      </button>
+      </button> */}
     </div>
   );
 };
@@ -702,13 +702,14 @@ export default function N8nWorkflowBuilder() {
         //   type: "info",
         //   message: "Execution started. Polling for status...",
         // });
-        setExecutionStatus({
-          type: "success",
-          message: "Workflow saved successfully!",
-        });
+        setInterval(() => {
+          setExecutionStatus({
+            type: "success",
+            message: "Workflow executing ....",
+          });
+        }, 1000);
+
         // alert("executed");
-      } else {
-        throw new Error("Did not receive an execution ID.");
       }
 
       // pollingIntervalRef.current = setInterval(async () => {
