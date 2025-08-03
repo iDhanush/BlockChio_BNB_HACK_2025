@@ -1,6 +1,6 @@
 import asyncio
+import os
 from http.client import responses
-
 from langsmith import Client
 from agents.llm import get_llm
 from langchain_core.runnables import chain
@@ -11,8 +11,10 @@ from langchain.agents import create_structured_chat_agent
 from agents.whatsapp_agent.schemas import WhatsappTextInput, WhatsappImageInput, AgentState
 from agents.whatsapp_agent.whatsapp import snd_image, snd_message
 from twilio.rest import Client as Whatsapp
-
 from globar_vars import Var
+from dotenv import load_dotenv
+
+load_dotenv()
 
 prompt = Client().pull_prompt("hwchase17/structured-chat-agent", include_model=True)
 
@@ -26,7 +28,7 @@ class WhatsappAgent:
             for key, val in cred.items():
                 creds2[key] = val
         self.creds = creds2
-        self.creds["whatsapp_client"] = Whatsapp(self.creds.get('account_sid'), self.creds.get('auth_token'))
+        self.creds["whatsapp_client"] = Whatsapp(self.creds.get('account_sid', os.environ.get('ACCOUNT_SID')), self.creds.get('auth_token', os.environ.get('AUTH_TOKEN')))
         self.struct_tools = self.StructTools(self)
         self.agent = self.get_agent()
 
@@ -127,15 +129,12 @@ class WhatsappAgent:
 
 import asyncio
 async def main():
-    account_sid = Var.ACCOUNT_SID
-    auth_token = Var.AUTH_TOKEN
-    whatsapp_number = Var.WHATSAPP_NUMBER
-    cred = [{"account_sid":account_sid, "auth_token":auth_token, "whatsapp_number":whatsapp_number}]
+    cred = []
     agent = WhatsappAgent(cred)
     agent.tools.append(agent.struct_tools.send_message)
     agent.tools.append(agent.struct_tools.send_image)
     # Sample query to test the agent with tool usage
-    query = "Send image https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtzQxCr9uIe4TS2m6Hg5IvNqQATg-wpo3KdQ&s +918891636432"
+    query = "Send image https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtzQxCr9uIe4TS2m6Hg5IvNqQATg-wpo3KdQ&s +918891712003"
 
     print(f"User: {query}")
     response = await agent.run(query)
