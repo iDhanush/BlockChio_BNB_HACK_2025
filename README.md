@@ -2,7 +2,7 @@
 
 
 [![Languages](https://media.licdn.com/dms/image/v2/D5622AQHRByQPz0MNCA/feedshare-shrink_2048_1536/B56ZhA2vHDHMAs-/0/1753434748710?e=1765411200&v=beta&t=0ki6gPKEL_Mfg2eKkrb9nD0GenYafCGwbJ2zQYKktdQ)](https://github.com/iDhanush/BlockChio_BNB_HACK_2025)
-[![Languages]([https://img.shields.io/badge/Python-54.4%25-blue?logo=python)](https://github.com/iDhanush/BlockChio_BNB_HACK_2025](https://media.licdn.com/dms/image/v2/D5622AQHXsUFqW11rrg/feedshare-shrink_2048_1536/B56ZhA2vGPHkAo-/0/1753434748285?e=1765411200&v=beta&t=m67Y-fdNhHBkOoGBCKZ4yOaQ18TMA7kpUzAD0Un2BeM))
+[![Languages](https://media.licdn.com/dms/image/v2/D5622AQHXsUFqW11rrg/feedshare-shrink_2048_1536/B56ZhA2vGPHkAo-/0/1753434748285?e=1765411200&v=beta&t=m67Y-fdNhHBkOoGBCKZ4yOaQ18TMA7kpUzAD0Un2BeM)](https://github.com/iDhanush/BlockChio_BNB_HACK_2025)
 
 **BlockChio** is an **AI agent workflow builder for blockchain** — a no-code platform inspired by **LangChain/LangFlow**, enhanced with **blockchain-native agents** and **on-chain agentic memory**.
 
